@@ -1,0 +1,99 @@
+import { Request, Response } from "express";
+import {
+  registerJobSeekersUserService,
+  loginJobSeekersUserService,
+  otpVerificationService,
+  resendOTPService,
+} from "./jobSeekerUser.service";
+import sendResponse from "../../utils/sendResponse";
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import { generateToken } from "../../utils/JwtToken";
+import ApiError from "../../errors/ApiError";
+
+export const registerJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { name, email, password, confirmPassword } = req.body;
+
+    // Call the service to register the user and send OTP
+    const { otp } = await registerJobSeekersUserService(
+      name,
+      email,
+      password,
+      confirmPassword
+    );
+
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message:
+        "OTP sent to your email. Please verify to continue registration.",
+      data: {},
+    });
+  }
+);
+export const logionJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    const { token, user } = await loginJobSeekersUserService(email, password);
+
+    // 3. Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "Login successful.", // Message to be sent in the response
+      data: {
+        token, // Send the JWT token
+        user, // Send the user data (excluding password)
+      },
+    });
+  }
+);
+export const emailVerificationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+    const { message, token, user } = await otpVerificationService(email, otp);
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: message, // Message to be sent in the response
+      data: {
+        token, // Send the JWT token
+        user, // Send the user data (excluding password)
+      },
+    });
+  }
+);
+export const resendOTPJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const { otp, token } = await resendOTPService(email);
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "otp is send again", // Message to be sent in the response
+      data: {
+        token, // Send the JWT token
+        otp, // Send the user data (excluding password)
+      },
+    });
+  }
+);
+
+export const forgotPasswordSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const { otp, token } = await resendOTPService(email);
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "otp is send again", // Message to be sent in the response
+      data: {
+        token, // Send the JWT token
+        otp, // Send the user data (excluding password)
+      },
+    });
+  }
+);

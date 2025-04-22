@@ -1,0 +1,6 @@
+DATABASE_URL="mongodb://localhost:27017/TestJobDb"
+JWT_SECRET_KEY="myToken"
+Nodemailer_GMAIL ="Gmail"
+Nodemailer_GMAIL_PASSWORD ="Password"
+UPLOAD_FOLDER = public/images
+endpoint_secret="Secret"
