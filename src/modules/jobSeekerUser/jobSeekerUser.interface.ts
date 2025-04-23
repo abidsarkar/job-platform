@@ -45,9 +45,12 @@ export interface IJobSeekerUser extends Document {
   otpExpiresAt: Date | null;
   isVerified?: boolean;
   isActiveAccount?: AccountStatus;
+  isForgotPasswordVerified?: boolean;
+  // Profile Picture
   profilePicture?: {
-    publicFileURL: string;
-    path: string;
+    fileName: string;   // The name of the file (e.g., 'profile_picture.jpg')
+    filePath: string;   // The relative path of the file in the public folder (e.g., 'uploads/profile_pictures/profile_picture.jpg')
+    publicFileURL: string;  // The URL to access the file (e.g., '/uploads/profile_pictures/profile_picture.jpg')
   };
   // Reference fields
   jobDetailsID?: mongoose.Types.ObjectId; // Reference to JobSeekersJob model
@@ -62,7 +65,12 @@ export interface IJobSeekerJob extends Document {
   experience?: string;
   education?: string;
   portfolio?: string;
-  resumeSrc?: string;
+   // CV
+   resume?: {
+    fileName: string;
+    filePath: string;
+    publicFileURL: string;
+  };
   jobAlertRole?: JobAlertRole;
   jobAlertCity?: string;
   jobAlertRegion?: string;

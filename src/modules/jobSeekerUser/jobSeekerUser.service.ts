@@ -10,6 +10,8 @@ import {
   verifyPassword,
   sendOTPEmailRegister,
   otpExpireTime,
+  resendOTPEmail,
+  sendForgotPasswordOTPEmail,
 } from "./jobSeekerUser.utils"; // Utility to generate OTP
 import {
   generateRegisterToken,
@@ -62,7 +64,7 @@ export const registerJobSeekersUserService = async (
   // Generate OTP
   const otp = generateOTP(); // Generate OTP
   const otpExpiresAt = await otpExpireTime();
-  
+
   // Create a new job seeker user document with OTP and other fields
   const newUser = new jobSeekerUser({
     name,
@@ -133,7 +135,10 @@ export const loginJobSeekersUserService = async (
   };
 };
 // OTP Verification Service
-export const otpVerificationService = async (email: string, otp: string) => {
+export const otpVerificationJobSeekersUserService = async (
+  email: string,
+  otp: string
+) => {
   // 1. Check if the user exists in the database
   const user = await jobSeekerUser.findOne({ email });
   if (!user) {
@@ -163,6 +168,7 @@ export const otpVerificationService = async (email: string, otp: string) => {
 
   // 5. Mark the user as verified (optional, depending on your workflow)
   user.isVerified = true;
+  user.isForgotPasswordVerified = true;
   user.otp = null; // Clear OTP after successful verification
   user.otpExpiresAt = null; // Clear OTP expiration time
   await user.save();
@@ -186,29 +192,190 @@ export const otpVerificationService = async (email: string, otp: string) => {
     },
   };
 };
-export const resendOTPService = async (email: string) => {
+// Resend OTP Service
+export const resendOTPJobSeekersUserService = async (email: string) => {
   // 1. Check if the user exists
   const user = await jobSeekerUser.findOne({ email });
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
   }
 
-  // 2. send otp again
+  // 2. Generate OTP
   const otp = generateOTP(); // Generate OTP
-  const otpExpiresAt = await otpExpireTime();
+  const otpExpiresAt = await otpExpireTime(); // Get the OTP expiration time
 
+  // 3. Update the OTP and expiration time in the user's document
+  user.otp = otp;
+  user.otpExpiresAt = otpExpiresAt;
+
+  // Save the user document with the new OTP and expiration time
   await user.save();
 
-  // 6. Generate a JWT token for the user after successful OTP verification
+  // 4. Send OTP email to the user
+  await resendOTPEmail(email, otp, user.name);
+
+  // 5. Generate a JWT token for the user after successful OTP generation
   const token = generateToken({
     id: user._id.toString(),
     role: user.role,
     email: user.email,
   });
 
-  // 7. Return a success message along with the token
+  // 6. Return the OTP and token in the response
   return {
     token, // Return the generated token
-    otp,
+    otp, // Return the generated OTP
+  };
+};
+//forgot password service
+export const forgotPasswordOTPJobSeekersUserService = async (email: string) => {
+  // 1. Check if the user exists
+  const user = await jobSeekerUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+
+  // 2. Generate OTP
+  const otp = generateOTP(); // Generate OTP
+  const otpExpiresAt = await otpExpireTime(); // Get the OTP expiration time
+
+  // 3. Update the OTP and expiration time in the user's document
+  user.otp = otp;
+  user.otpExpiresAt = otpExpiresAt;
+  user.isForgotPasswordVerified = false; // Set the forgot password verification flag to true
+  // Save the user document with the new OTP and expiration time
+  await user.save();
+
+  // 4. Send OTP email to the user
+  await sendForgotPasswordOTPEmail(email, otp, user.name);
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
+    otp, // Return the generated OTP
+  };
+};
+export const changePasswordForgetPassJobSeekersUserService = async (
+  email: string,
+  password: string,
+  confirmPassword: string
+) => {
+  // 1. Check if the user exists
+  const user = await jobSeekerUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  if (!user.isForgotPasswordVerified) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "User  not verified OTP for forgot password."
+    );
+  }
+  // 2.password validation
+  if (!password || !confirmPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password are required."
+    );
+  }
+  if (password.length < 6) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password must be at least 6 characters long."
+    );
+  }
+  // Check if password and confirm password match
+  if (password !== confirmPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password do not match."
+    );
+  }
+  // 3. Hash the new password
+  const hashedPassword = await hashPassword(password);
+  user.password = hashedPassword; // Update the password in the user document
+  user.isForgotPasswordVerified = false; // Reset the forgot password verification flag
+  user.otp = null; // Clear OTP after successful verification
+  await user.save();
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
+  };
+};
+export const changePasswordJobSeekersUserService = async (
+  email: string,
+  currentPassword: string,
+  newPassword: string,
+  confirmNewPassword: string
+) => {
+  // 1. Check if the user exists
+  const user = await jobSeekerUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  const storedPassword = user.password;
+  if (!storedPassword) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "User Not verified");
+  }
+  //2. check if current password is correct
+  const isPasswordValid = await verifyPassword(currentPassword, storedPassword);
+  if (!isPasswordValid) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Current Password is not correct"
+    );
+  }
+  // 3.both password same
+  if (!newPassword || !confirmNewPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password are required."
+    );
+  }
+  if (newPassword.length < 6) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password must be at least 6 characters long."
+    );
+  }
+  // Check if password and confirm password match
+  if (newPassword !== confirmNewPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password do not match."
+    );
+  }
+  // 3. Hash the new password
+  const hashedPassword = await hashPassword(newPassword);
+  user.password = hashedPassword; // Update the password in the user document
+  user.isForgotPasswordVerified = false; // Reset the forgot password verification flag
+  user.otp = null; // Clear OTP after successful verification
+  await user.save();
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
   };
 };

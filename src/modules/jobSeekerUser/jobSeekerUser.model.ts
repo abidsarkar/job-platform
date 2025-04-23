@@ -25,9 +25,11 @@ const jobSeekerUserSchema = new Schema<IJobSeekerUser>({
     enum: Object.values(AccountStatus),
     default: "active",
   },
+  isForgotPasswordVerified: { type: Boolean, default: false },
   profilePicture: {
+    fileName: { type: String, required: false },
+    filePath: { type: String, required: false },
     publicFileURL: { type: String, required: false },
-    path: { type: String, required: false },
   },
    // Adding references to other models
    jobDetailsID: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekersJob" },
@@ -42,7 +44,11 @@ const jobSeekerJobSchema = new Schema<IJobSeekerJob>({
   experience: { type: String, required: false },
   education: { type: String, required: false },
   portfolio: { type: String, required: false },
-  resumeSrc: { type: String, required: false },
+  resume:{
+    fileName: { type: String, required: false },
+    filePath: { type: String, required: false },
+    publicFileURL: { type: String, required: false },
+  },
   jobAlertRole: {
     type: String,
     enum: Object.values(JobAlertRole),

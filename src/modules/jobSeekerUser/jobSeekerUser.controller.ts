@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import {
   registerJobSeekersUserService,
   loginJobSeekersUserService,
-  otpVerificationService,
-  resendOTPService,
+  otpVerificationJobSeekersUserService,
+  resendOTPJobSeekersUserService,
+  forgotPasswordOTPJobSeekersUserService,
+  changePasswordForgetPassJobSeekersUserService,
+  changePasswordJobSeekersUserService
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -45,8 +48,8 @@ export const logionJobSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "Login successful.", // Message to be sent in the response
       data: {
-        token, // Send the JWT token
-        user, // Send the user data (excluding password)
+        token:token, // Send the JWT token
+        userData:user, // Send the user data (excluding password)
       },
     });
   }
@@ -54,7 +57,10 @@ export const logionJobSeekersUser = catchAsync(
 export const emailVerificationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { email, otp } = req.body;
-    const { message, token, user } = await otpVerificationService(email, otp);
+    const { message, token, user } = await otpVerificationJobSeekersUserService(
+      email,
+      otp
+    );
     sendResponse(res, {
       statusCode: httpStatus.OK, // Status code for successful login
       success: true, // Indicates success
@@ -69,7 +75,23 @@ export const emailVerificationJobSeekersUser = catchAsync(
 export const resendOTPJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { email } = req.body;
-    const { otp, token } = await resendOTPService(email);
+    const { token } = await resendOTPJobSeekersUserService(email);
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "otp is send again", // Message to be sent in the response
+      data: {
+        token, // Send the JWT token
+        // Send the user data (excluding password)
+      },
+    });
+  }
+);
+
+export const forgotPasswordOTPSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const { otp, token } = await forgotPasswordOTPJobSeekersUserService(email);
     sendResponse(res, {
       statusCode: httpStatus.OK, // Status code for successful login
       success: true, // Indicates success
@@ -81,18 +103,39 @@ export const resendOTPJobSeekersUser = catchAsync(
     });
   }
 );
-
-export const forgotPasswordSeekersUser = catchAsync(
+export const ChangePasswordForgetPassSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
-    const { email } = req.body;
-    const { otp, token } = await resendOTPService(email);
+    const { email, password, confirmPassword } = req.body;
+    const { token } = await changePasswordForgetPassJobSeekersUserService(
+      email,
+      password,
+      confirmPassword
+    );
     sendResponse(res, {
       statusCode: httpStatus.OK, // Status code for successful login
       success: true, // Indicates success
-      message: "otp is send again", // Message to be sent in the response
+      message: "Password Change Successful", // Message to be sent in the response
       data: {
-        token, // Send the JWT token
-        otp, // Send the user data (excluding password)
+        token, 
+      },
+    });
+  }
+);
+export const ChangePasswordSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email,currentPassword, newPassword, confirmNewPassword } = req.body;
+    const { token } = await changePasswordJobSeekersUserService(
+      email,
+      currentPassword,
+      newPassword,
+      confirmNewPassword
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "Password Change Successful", // Message to be sent in the response
+      data: {
+        token:token, 
       },
     });
   }

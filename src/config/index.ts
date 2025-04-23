@@ -8,7 +8,7 @@ export const DATABASE_URL = process.env.DATABASE_URL;
 export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 export const Nodemailer_GMAIL = process.env.Nodemailer_GMAIL;
 export const Nodemailer_GMAIL_PASSWORD = process.env.Nodemailer_GMAIL_PASSWORD;
-export const OTP_EXPIRE_TIME = Number(process.env.OTP_EXPIRE_TIME) || 10;
+export const OTP_EXPIRE_TIME = Number(process.env.OTP_EXPIRE_TIME) || 5*60*1000;
 
 export const UPLOAD_FOLDER = process.env.UPLOAD_FOLDER;
 export const max_file_size = 52428800; //-> 50MB;
