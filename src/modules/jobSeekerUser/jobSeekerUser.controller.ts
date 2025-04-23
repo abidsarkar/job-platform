@@ -16,7 +16,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { generateToken } from "../../utils/JwtToken";
 import ApiError from "../../errors/ApiError";
-
+const path = require('path');
 export const registerJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { name, email, password, confirmPassword } = req.body;
@@ -151,9 +151,8 @@ export const uploadProfileInformation = catchAsync(
     
     const { name ,email} = req.body;
     const { title, experience, education, personalWebsite } = req.body;
-    
-    const file = req.files;
-    let profilePictureData = null;
+    const profilePicPath = `/uploads/profile-pictures/${req.file?.filename}`; // relative to public/
+    const profilePicOriginalName = `/uploads/profile-pictures/${req.file?.originalname}`; // relative to public/
   // Step 1: Handle profile picture upload
  
     
@@ -166,7 +165,8 @@ export const uploadProfileInformation = catchAsync(
       data: {
         name:updatedName,
         jobSeekerPersonal,
-        profilePicture: profilePictureData, 
+        profilePicturePath: profilePicPath, 
+        profilePictureName: profilePicOriginalName, 
       },
     });
   });
