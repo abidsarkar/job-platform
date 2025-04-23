@@ -6,9 +6,9 @@ import {
   JobAlertRole,
   Role,
   AccountStatus,
-  
-  IJobSeekerJob,
-  IJobSeekerPersonalInfo,
+  IJobSeekerPersonal,
+  IJobSeekerProfile,
+  IJobSeekerAccountSettings,
   IJobSeekerSocialMedia,
 } from "./jobSeekerUser.interface"; // Import IUser Interface
 // User Schema for Job Seeker
@@ -39,31 +39,24 @@ const jobSeekerUserSchema = new Schema<IJobSeekerUser>({
 
 const jobSeekerUser = mongoose.model<IJobSeekerUser>("JobSeekerUser", jobSeekerUserSchema);
 // Job Information Schema
-const jobSeekerJobSchema = new Schema<IJobSeekerJob>({
+const jobSeekerPersonalSchema = new Schema<IJobSeekerPersonal>({
   jobTitle: { type: String, required: false },
   experience: { type: String, required: false },
   education: { type: String, required: false },
-  portfolio: { type: String, required: false },
+  personalWebsite: { type: String, required: false },
   resume:{
     fileName: { type: String, required: false },
     filePath: { type: String, required: false },
     publicFileURL: { type: String, required: false },
   },
-  jobAlertRole: {
-    type: String,
-    enum: Object.values(JobAlertRole),
-    required: false,
-  },
-  jobAlertCity: { type: String, required: false },
-  jobAlertRegion: { type: String, required: false },
-  jobAlertCountry: { type: String, required: false },
+  
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekerUser", required: true }, // Reference to the JobSeekerUser model
 });
 
-const JobSeekersJob = mongoose.model<IJobSeekerJob>("JobSeekersJob", jobSeekerJobSchema);
+const JobSeekersPersonal = mongoose.model<IJobSeekerPersonal>("JobSeekersPersonal", jobSeekerPersonalSchema);
 
 // Personal Information Schema
-const JobSeekersPersonalInfoSchema = new Schema<IJobSeekerPersonalInfo>({
+const JobSeekersProfileSchema = new Schema<IJobSeekerProfile>({
   nationality: { type: String, required: false },
   dob: { type: Date, required: false },
   gender: { type: String, enum: Object.values(Gender), required: false },
@@ -73,18 +66,25 @@ const JobSeekersPersonalInfoSchema = new Schema<IJobSeekerPersonalInfo>({
     required: false,
   },
   biography: { type: String, required: false },
-  fullAddress: { type: String, required: false },
-  city: { type: String, required: false },
-  country: { type: String, required: false },
-  region: { type: String, required: false },
-  phoneNumber: { type: String, required: false },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekerUser", required: true }, // Reference to the JobSeekerUser model
+ userId: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekerUser", required: true }, // Reference to the JobSeekerUser model
 
 });
 
-const JobSeekersPersonalInfo = mongoose.model<IJobSeekerPersonalInfo>("JobSeekersPersonalInfo", JobSeekersPersonalInfoSchema);
+const JobSeekersProfile = mongoose.model<IJobSeekerProfile>("JobSeekersProfile", JobSeekersProfileSchema);
+
+const JobSeekersAccountSettingSchema = new Schema<IJobSeekerAccountSettings>({
+  fullAddress:{type:String,required:false},
+  city:{type:String,required:false},
+  phoneNumber:{type:String,required:false},
+  jobAlertRole:{type:String,required:false},
+  jobAlertCity:{type:String,required:false},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekerUser", required: true }, // Reference to the JobSeekerUser model
+})
+const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>("JobSeekersAccountSetting", JobSeekersAccountSettingSchema);
+
 // Social Media Schema
 const JobSeekersSocialMediaSchema = new Schema<IJobSeekerSocialMedia>({
+  
   facebookLink: { type: String, required: false },
   xLink: { type: String, required: false },
   instagramLink: { type: String, required: false },
@@ -96,5 +96,5 @@ const JobSeekersSocialMedia = mongoose.model<IJobSeekerSocialMedia>("JobSeekersS
 // Mongoose Schema for Job Seeker (Initial Registration)
 
 
-export { jobSeekerUser, JobSeekersJob, JobSeekersPersonalInfo, JobSeekersSocialMedia };
+export { jobSeekerUser, JobSeekersPersonal,JobSeekersProfile, JobSeekersAccountSetting, JobSeekersSocialMedia };
 

@@ -1,3 +1,4 @@
+// utils/multerConfig.ts
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -13,7 +14,6 @@ if (!fs.existsSync(uploadFolder)) {
 // Configure multer storage and file filtering
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Dynamically set the destination folder based on the file field name
     let folderPath = 'profile_pictures'; // Default to profile_pictures
 
     if (file.fieldname === 'banner') {
@@ -36,7 +36,6 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for image types (for profile pictures and banners)
 const fileFilter = (req: any, file: any, cb: any) => {
   const allowedImageTypes = /jpeg|jpg|png/;
   const allowedDocTypes = /pdf|doc|docx/; // For CV files
@@ -52,7 +51,6 @@ const fileFilter = (req: any, file: any, cb: any) => {
   }
 };
 
-// Limit the size of the uploaded file to 10MB
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -61,6 +59,6 @@ const upload = multer({
   { name: 'profilePicture', maxCount: 1 },
   { name: 'banner', maxCount: 1 },
   { name: 'cv', maxCount: 1 }
-]); // You can upload profile picture, banner, and CV
+]);
 
-export default upload;
+export { upload };

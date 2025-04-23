@@ -1,7 +1,8 @@
 import {
   jobSeekerUser,
-  JobSeekersJob,
-  JobSeekersPersonalInfo,
+  JobSeekersPersonal,
+  JobSeekersProfile,
+  JobSeekersAccountSetting,
   JobSeekersSocialMedia,
 } from "./jobSeekerUser.model"; // Import updated model
 import {
@@ -379,3 +380,76 @@ export const changePasswordJobSeekersUserService = async (
     token, // Return the generated token
   };
 };
+//profile picture
+// Handle profile picture upload
+export const uploadJobSeekersProfilePictureService = async (file: Express.Multer.File) => {
+  if (!file) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Profile picture is required.");
+  }
+
+  // Construct the public URL for the file
+  const fileName = file.filename;
+  const filePath = file.path;
+  const publicFileURL = `/uploads/${fileName}`; // Public URL to access the file
+
+  return { fileName, filePath, publicFileURL };
+};
+
+export const updateNameJobSeekersUserService = async (
+  name: string,
+  email: string
+) => {
+  if (!email) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  if (!name) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Name is not found.");
+  }
+  // 1. Check if the user exists
+  const user = await jobSeekerUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  // 2 update name
+  user.name = name;
+  await user.save();
+  return {
+    id: user._id.toString(),
+    updatedName: user.name,
+  };
+};
+// Service to handle job seeker's personal information
+export const uploadJobSeekersPersonalInformationService = async (
+  id: string,
+  title: string,
+  experience: string,
+  education: string,
+  personalWebsite: string
+) => {
+  let user = await jobSeekerUser.findById(id);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+
+  // Check if the job seeker's personal information exists, if not create it
+  let jobSeekerPersonal = await JobSeekersPersonal.findOne({ userId: user._id });
+  if (!jobSeekerPersonal) {
+    jobSeekerPersonal = new JobSeekersPersonal({
+      userId: user._id,
+      jobTitle: title,
+      experience,
+      education,
+      personalWebsite,
+    });
+  } else {
+    // Update the personal information if it exists
+    jobSeekerPersonal.jobTitle = title;
+    jobSeekerPersonal.experience = experience;
+    jobSeekerPersonal.education = education;
+    jobSeekerPersonal.personalWebsite = personalWebsite;
+  }
+
+  await jobSeekerPersonal.save(); // Save updated or new personal info
+  return jobSeekerPersonal;
+};
+// Service to handle job seeker's profile information (address, city, etc.)

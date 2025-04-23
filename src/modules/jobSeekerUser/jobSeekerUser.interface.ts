@@ -59,41 +59,42 @@ export interface IJobSeekerUser extends Document {
 }
 
 // Job Information Interface
-export interface IJobSeekerJob extends Document {
+export interface IJobSeekerPersonal extends Document {
   _id: mongoose.Types.ObjectId; // Make sure it's a valid ObjectId reference
   jobTitle?: string;
   experience?: string;
   education?: string;
-  portfolio?: string;
+  personalWebsite?: string;
    // CV
    resume?: {
     fileName: string;
     filePath: string;
     publicFileURL: string;
   };
-  jobAlertRole?: JobAlertRole;
-  jobAlertCity?: string;
-  jobAlertRegion?: string;
-  jobAlertCountry?: string;
-  userId: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
+  
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
 }
 
 // Personal Information Interface
-export interface IJobSeekerPersonalInfo extends Document {
+export interface IJobSeekerProfile extends Document {
   _id: mongoose.Types.ObjectId;
   nationality?: string;
   dob?: Date;
   gender?: Gender;
   maritalStatus?: MaritalStatus;
   biography?: string;
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
+}
+export interface IJobSeekerAccountSettings extends Document{
+  _id: mongoose.Types.ObjectId;
   fullAddress?: string;
   city?: string;
-  country?: string;
-  region?: string;
   phoneNumber?: string;
-  userId: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
-}
+  jobAlertRole?: JobAlertRole;
+  jobAlertCity?: string;
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
 
+}
 // Social Media Information Interface
 export interface IJobSeekerSocialMedia extends Document {
   _id: mongoose.Types.ObjectId;
@@ -101,5 +102,5 @@ export interface IJobSeekerSocialMedia extends Document {
   xLink?: string;
   instagramLink?: string;
   linkedinLink?: string;
-  userId: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
 }

@@ -80,3 +80,26 @@
     ]
   }
 }
+{
+  "categoryType": "education", 
+  "items": ["High School", "Intermediate", "Graduation", "Master Degree", "Bechelor Degree", "PhD"]
+}
+{
+  "categoryType": "experience", 
+  "items": ["Freshers", "0-1 Years", "1-2 Years", "3-4 Years 5+ Years", "7+ Years", "15+ Years"]
+}
+{
+  "categoryType": "jobCategory",
+  "items": [
+    "Software Developer",
+    "Web Developer",
+    "Data Scientist",
+    "Project Manager",
+    "Graphic Designer",
+    "Product Manager",
+    "UX/UI Designer",
+    "Marketing Manager",
+    "Business Analyst",
+    "System Administrator"
+  ]
+}

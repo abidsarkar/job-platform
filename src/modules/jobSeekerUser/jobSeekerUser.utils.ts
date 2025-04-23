@@ -1,9 +1,10 @@
 import {
   jobSeekerUser,
-  JobSeekersJob,
-  JobSeekersPersonalInfo,
+  JobSeekersPersonal,
+  JobSeekersProfile,
+  JobSeekersAccountSetting,
   JobSeekersSocialMedia,
-} from "./jobSeekerUser.model";
+} from "./jobSeekerUser.model"; 
 import {
   Nodemailer_GMAIL,
   Nodemailer_GMAIL_PASSWORD,

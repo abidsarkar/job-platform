@@ -6,6 +6,7 @@ import { NotificationRoutes } from "../modules/notifications/notification.route"
 import { contactUsRoutes } from "../modules/contactUs/contactUs.route";
 import { SupportRoutes } from "../modules/support/support.route";
 import  {jobSeekerUserRoutes} from "../modules/jobSeekerUser/jobSeekerUser.route"
+import { categoryRoutes} from "../modules/allCategory/allCategory.route"
 
 import {
   AppInstruction,
@@ -36,4 +37,8 @@ export const routesConfig = [
   //------>publishing app <--------------
   { path: "/privacy-policy-page", handler: htmlRoute },
   { path: "/app-instruction", handler: AppInstruction },
+  //upload category by admin
+  { path: "/api/v1/category", handler: categoryRoutes },
+
+
 ];

@@ -6,7 +6,10 @@ import {
   resendOTPJobSeekersUserService,
   forgotPasswordOTPJobSeekersUserService,
   changePasswordForgetPassJobSeekersUserService,
-  changePasswordJobSeekersUserService
+  changePasswordJobSeekersUserService,
+  uploadJobSeekersProfilePictureService,
+  updateNameJobSeekersUserService,
+  uploadJobSeekersPersonalInformationService
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -48,8 +51,8 @@ export const logionJobSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "Login successful.", // Message to be sent in the response
       data: {
-        token:token, // Send the JWT token
-        userData:user, // Send the user data (excluding password)
+        token: token, // Send the JWT token
+        userData: user, // Send the user data (excluding password)
       },
     });
   }
@@ -116,14 +119,15 @@ export const ChangePasswordForgetPassSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "Password Change Successful", // Message to be sent in the response
       data: {
-        token, 
+        token,
       },
     });
   }
 );
 export const ChangePasswordSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
-    const { email,currentPassword, newPassword, confirmNewPassword } = req.body;
+    const { email, currentPassword, newPassword, confirmNewPassword } =
+      req.body;
     const { token } = await changePasswordJobSeekersUserService(
       email,
       currentPassword,
@@ -135,8 +139,34 @@ export const ChangePasswordSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "Password Change Successful", // Message to be sent in the response
       data: {
-        token:token, 
+        token: token,
       },
     });
   }
 );
+// profile controller
+//------new controller------
+export const uploadProfileInformation = catchAsync(
+  async (req: Request, res: Response) => {
+    
+    const { name ,email} = req.body;
+    const { title, experience, education, personalWebsite } = req.body;
+    
+    const file = req.files;
+    let profilePictureData = null;
+  // Step 1: Handle profile picture upload
+ 
+    
+    const {id,updatedName} =await updateNameJobSeekersUserService(name,email);
+    const jobSeekerPersonal=await uploadJobSeekersPersonalInformationService(id,title,experience,education,personalWebsite)
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Profile updated successfully.",
+      data: {
+        name:updatedName,
+        jobSeekerPersonal,
+        profilePicture: profilePictureData, 
+      },
+    });
+  });

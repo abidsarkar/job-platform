@@ -7,9 +7,9 @@ import {
   resendOTPJobSeekersUser,
   forgotPasswordOTPSeekersUser,
   ChangePasswordForgetPassSeekersUser,
-  ChangePasswordSeekersUser
+  ChangePasswordSeekersUser,uploadProfileInformation
 } from "./jobSeekerUser.controller";
-import upload from "../../multer/multer";
+import {upload} from "../../multer/multer.upload"
 import { RoleCheckMiddleware } from "../../middlewares/roleGuard";
 import{verifyTokenMiddleware} from "../../middlewares/verifyTokenMiddleware"
 import {
@@ -31,6 +31,6 @@ router.post(
 router.post("/changePasswordForgetPass", ChangePasswordForgetPassSeekersUser);
 router.post("/changePassword",verifyTokenMiddleware, RoleCheckMiddleware("jobSeeker"),ChangePasswordSeekersUser);
 //upload and update profile picture
-router.post("/uploadProject",verifyTokenMiddleware, RoleCheckMiddleware("jobSeeker"),ChangePasswordSeekersUser);
+router.post("/uploadProject",upload,verifyTokenMiddleware, RoleCheckMiddleware("jobSeeker"),uploadProfileInformation);
 
 export const jobSeekerUserRoutes = router;
