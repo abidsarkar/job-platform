@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   jobSeekerUser,
   JobSeekersPersonal,
@@ -382,18 +384,52 @@ export const changePasswordJobSeekersUserService = async (
 };
 //profile picture
 // Handle profile picture upload
-export const uploadJobSeekersProfilePictureService = async (file: Express.Multer.File) => {
-  if (!file) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Profile picture is required.");
+export const uploadJobSeekersProfilePictureService = async (
+  email: string,
+  filePathURL: string,
+  fileOriginalName: string,
+  fileServerName: string
+) => {
+  const user = await jobSeekerUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User Not Found");
   }
 
-  // Construct the public URL for the file
-  const fileName = file.filename;
-  const filePath = file.path;
-  const publicFileURL = `/uploads/${fileName}`; // Public URL to access the file
+  if (!filePathURL || !fileOriginalName || !fileServerName) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "File not uploaded properly.");
+  }
 
-  return { fileName, filePath, publicFileURL };
+  // 🔥 Delete old image if not default
+  const oldFileServerName = user.profilePicture?.fileServerName;
+  const defaultFileName = "1745471655982-763482898.jpg"; // your default image name
+  if (oldFileServerName && oldFileServerName !== defaultFileName) {
+    const oldFilePath = path.join(__dirname, "../../public/uploads/profile_pictures", oldFileServerName);
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath); // delete old file
+    }
+  }
+
+  // ✅ Update user with new profile picture
+  const updatedUser = await jobSeekerUser.findOneAndUpdate(
+    { email },
+    {
+      $set: {
+        profilePicture: {
+          filePathURL,
+          fileOriginalName,
+          fileServerName,
+        },
+      },
+    },
+    { new: true }
+  );
+
+  return {
+    id: updatedUser?._id,
+    profilePicture: updatedUser?.profilePicture,
+  };
 };
+
 
 export const updateNameJobSeekersUserService = async (
   name: string,
@@ -432,7 +468,9 @@ export const uploadJobSeekersPersonalInformationService = async (
   }
 
   // Check if the job seeker's personal information exists, if not create it
-  let jobSeekerPersonal = await JobSeekersPersonal.findOne({ userId: user._id });
+  let jobSeekerPersonal = await JobSeekersPersonal.findOne({
+    userId: user._id,
+  });
   if (!jobSeekerPersonal) {
     jobSeekerPersonal = new JobSeekersPersonal({
       userId: user._id,

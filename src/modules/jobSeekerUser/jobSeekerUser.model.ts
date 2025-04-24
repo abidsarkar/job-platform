@@ -27,14 +27,16 @@ const jobSeekerUserSchema = new Schema<IJobSeekerUser>({
   },
   isForgotPasswordVerified: { type: Boolean, default: false },
   profilePicture: {
-    fileName: { type: String, required: false },
-    filePath: { type: String, required: false },
-    publicFileURL: { type: String, required: false },
+    filePathURL: { type: String,default:"/uploads/profile_pictures/1745471655982-763482898.jpg", required: false },
+    fileOriginalName: { type: String,default:"defaultProfilePictureAADD.jpg", required: false },
+    fileServerName: { type: String,default:
+      "1745471655982-763482898.jpg", required: false },
   },
    // Adding references to other models
    jobDetailsID: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekersJob" },
    personalInfoID: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekersPersonalInfo" },
    socialMediaID: { type: mongoose.Schema.Types.ObjectId, ref: "JobSeekersSocialMedia" },
+   
 });
 
 const jobSeekerUser = mongoose.model<IJobSeekerUser>("JobSeekerUser", jobSeekerUserSchema);

@@ -9,14 +9,14 @@ import {
   changePasswordJobSeekersUserService,
   uploadJobSeekersProfilePictureService,
   updateNameJobSeekersUserService,
-  uploadJobSeekersPersonalInformationService
+  uploadJobSeekersPersonalInformationService,
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { generateToken } from "../../utils/JwtToken";
 import ApiError from "../../errors/ApiError";
-const path = require('path');
+const path = require("path");
 export const registerJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { name, email, password, confirmPassword } = req.body;
@@ -148,25 +148,52 @@ export const ChangePasswordSeekersUser = catchAsync(
 //------new controller------
 export const uploadProfileInformation = catchAsync(
   async (req: Request, res: Response) => {
-    
-    const { name ,email} = req.body;
-    const { title, experience, education, personalWebsite } = req.body;
-    const profilePicPath = `/uploads/profile-pictures/${req.file?.filename}`; // relative to public/
-    const profilePicOriginalName = `/uploads/profile-pictures/${req.file?.originalname}`; // relative to public/
-  // Step 1: Handle profile picture upload
- 
-    
-    const {id,updatedName} =await updateNameJobSeekersUserService(name,email);
-    const jobSeekerPersonal=await uploadJobSeekersPersonalInformationService(id,title,experience,education,personalWebsite)
+    const { name, email, title, experience, education, personalWebsite } =
+      req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const profilePictureFile = files?.profilePicture?.[0];
+    //check update on profile picture came or not
+    let filePathURL = profilePictureFile.filename;
+    let fileOriginalName = profilePictureFile.originalname;
+    let fileServerName = profilePictureFile.filename;
+    if (profilePictureFile) {
+      filePathURL = `/uploads/profile_pictures/${profilePictureFile.filename}`;
+      fileOriginalName = profilePictureFile.originalname;
+      fileServerName = profilePictureFile.filename;
+
+      // Upload profile picture
+      await uploadJobSeekersProfilePictureService(
+        email,
+        filePathURL,
+        fileOriginalName,
+        fileServerName
+      );
+    }
+    if(!profilePictureFile){
+      
+    }
+
+    const { id, updatedName } = await updateNameJobSeekersUserService(
+      name,
+      email
+    );
+    const jobSeekerPersonal = await uploadJobSeekersPersonalInformationService(
+      id,
+      title,
+      experience,
+      education,
+      personalWebsite
+    );
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Profile updated successfully.",
       data: {
-        name:updatedName,
+        name: updatedName,
         jobSeekerPersonal,
-        profilePicturePath: profilePicPath, 
-        profilePictureName: profilePicOriginalName, 
+        profilePicturePath: filePathURL,
+        profilePictureName: fileOriginalName,
       },
     });
-  });
+  }
+);

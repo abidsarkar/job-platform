@@ -48,9 +48,9 @@ export interface IJobSeekerUser extends Document {
   isForgotPasswordVerified?: boolean;
   // Profile Picture
   profilePicture?: {
-    fileName: string;   // The name of the file (e.g., 'profile_picture.jpg')
-    filePath: string;   // The relative path of the file in the public folder (e.g., 'uploads/profile_pictures/profile_picture.jpg')
-    publicFileURL: string;  // The URL to access the file (e.g., '/uploads/profile_pictures/profile_picture.jpg')
+    filePathURL: string;   // The name of the file (e.g., 'profile_picture.jpg')
+    fileOriginalName: string;   // The relative path of the file in the public folder (e.g., 'uploads/profile_pictures/profile_picture.jpg')
+    fileServerName: string;  // The URL to access the file (e.g., '/uploads/profile_pictures/profile_picture.jpg')
   };
   // Reference fields
   jobDetailsID?: mongoose.Types.ObjectId; // Reference to JobSeekersJob model
