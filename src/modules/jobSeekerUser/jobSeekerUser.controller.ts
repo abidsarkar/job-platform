@@ -44,14 +44,20 @@ export const logionJobSeekersUser = catchAsync(
     const { email, password } = req.body;
 
     const { token, user } = await loginJobSeekersUserService(email, password);
-
+    res.cookie("accessToken", token, {
+      httpOnly: true,  // Makes the cookie accessible only to HTTP requests, not JavaScript
+      secure: process.env.NODE_ENV === "production",  // Set to true in production to use HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000,  // Token expiration time (7 days in milliseconds)
+      sameSite: "none",  // Prevents the cookie from being sent in cross-origin requests
+    });
+    
     // 3. Send the response back to the client
     sendResponse(res, {
       statusCode: httpStatus.OK, // Status code for successful login
       success: true, // Indicates success
       message: "Login successful.", // Message to be sent in the response
       data: {
-        token: token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         userData: user, // Send the user data (excluding password)
       },
     });
@@ -124,7 +130,7 @@ export const ChangePasswordForgetPassSeekersUser = catchAsync(
     });
   }
 );
-export const ChangePasswordSeekersUser = catchAsync(
+export const ChangePasswordJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { email, currentPassword, newPassword, confirmNewPassword } =
       req.body;
@@ -145,38 +151,60 @@ export const ChangePasswordSeekersUser = catchAsync(
   }
 );
 // profile controller
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
+}
 //------new controller------
-export const uploadProfileInformation = catchAsync(
+export const uploadProfilePictureJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
-    const { name, email, title, experience, education, personalWebsite } =
-      req.body;
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const profilePictureFile = files?.profilePicture?.[0];
-    //check update on profile picture came or not
-    let filePathURL = profilePictureFile.filename;
-    let fileOriginalName = profilePictureFile.originalname;
-    let fileServerName = profilePictureFile.filename;
-    if (profilePictureFile) {
-      filePathURL = `/uploads/profile_pictures/${profilePictureFile.filename}`;
-      fileOriginalName = profilePictureFile.originalname;
-      fileServerName = profilePictureFile.filename;
 
-      // Upload profile picture
-      await uploadJobSeekersProfilePictureService(
-        email,
-        filePathURL,
-        fileOriginalName,
-        fileServerName
-      );
+    if (!profilePictureFile) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "No profile picture uploaded.");
     }
-    if(!profilePictureFile){
-      
+    if (!req.user) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "User not authenticated.");
     }
+    const { email,id} = req.user;  // Assuming email is sent in the request body
+    if (!email) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Email not found in the token.");
+    }
+    const filePathURL = `/uploads/profile_pictures/${profilePictureFile.filename}`;
+    const fileOriginalName = profilePictureFile.originalname;
+    const fileServerName = profilePictureFile.filename;
 
-    const { id, updatedName } = await updateNameJobSeekersUserService(
-      name,
-      email
+    // Call the service to upload the profile picture
+    const updatedUser = await uploadJobSeekersProfilePictureService(
+      email,
+      filePathURL,
+      fileOriginalName,
+      fileServerName
     );
+
+    res.status(200).json({
+      success: true,
+      message: "Profile picture uploaded successfully.",
+      data: updatedUser,
+    });
+  }
+);
+export const updateProfileInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { name, email, title, experience, education, personalWebsite } = req.body;
+
+    // Update user name
+    const { id, updatedName } = await updateNameJobSeekersUserService(name, email);
+
+    // Update personal information
     const jobSeekerPersonal = await uploadJobSeekersPersonalInformationService(
       id,
       title,
@@ -184,15 +212,13 @@ export const uploadProfileInformation = catchAsync(
       education,
       personalWebsite
     );
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
+
+    res.status(200).json({
       success: true,
-      message: "Profile updated successfully.",
+      message: "Profile information updated successfully.",
       data: {
         name: updatedName,
         jobSeekerPersonal,
-        profilePicturePath: filePathURL,
-        profilePictureName: fileOriginalName,
       },
     });
   }

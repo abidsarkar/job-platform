@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import ApiError from "../errors/ApiError";
 import httpStatus from "http-status";
-
+// Define the DecodedToken interface
+interface DecodedToken {
+  id: string;
+  email: string;
+  role: string;
+}
 // Middleware to verify token from both headers and cookies
 export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFunction) => {
   let token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
@@ -19,7 +24,7 @@ export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFun
 
   try {
     // Verify the token and decode the payload
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as DecodedToken;
 
     // Attach the decoded payload to the request object
     req.user = decoded;

@@ -127,6 +127,8 @@ export const loginJobSeekersUserService = async (
     role: user.role, // Correct the role name spelling
     email: user.email,
   });
+  
+  
   return {
     token,
     user: {
