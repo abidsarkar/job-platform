@@ -6,7 +6,7 @@ import { OTPModel, UserModel } from "./user.model";
 
 import ApiError from "../../errors/ApiError";
 
-import { findUserByEmail, generateOTP } from "./user.utils";
+import { findUserBy Email, generateOTP } from "./user.utils";
 
 import httpStatus from "http-status";
 import { generateToken, verifyToken } from "../../utils/JwtToken";

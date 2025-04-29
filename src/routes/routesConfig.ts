@@ -7,7 +7,7 @@ import { contactUsRoutes } from "../modules/contactUs/contactUs.route";
 import { SupportRoutes } from "../modules/support/support.route";
 import  {jobSeekerUserRoutes} from "../modules/jobSeekerUser/jobSeekerUser.route"
 import { categoryRoutes} from "../modules/allCategory/allCategory.route"
-
+import {generalUserRoutes} from "../modules/generalUser/generalUser.route"
 import {
   AppInstruction,
   htmlRoute,
@@ -19,7 +19,7 @@ import { AdminRoutes } from "../modules/admin/admin.route";
 import { ArticalsRoute } from "../modules/articals/articals.route";
 
 export const routesConfig = [
-  { path: "/api/v1/auth", handler: UserRoutes },
+  { path: "/api/v1/auth", handler: generalUserRoutes },
   { path: "/api/v1/jobSeekerUser", handler: jobSeekerUserRoutes },
   { path: "/api/v1/terms", handler: TermsRoutes },
   { path: "/api/v1/about", handler: AboutRoutes },
