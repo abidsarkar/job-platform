@@ -4,7 +4,10 @@ import {
   registerGeneralUser,
   emailVerificationGeneralUser,
   logionGeneralUser,
-  resendOTPGeneralUser
+  resendOTPGeneralUser,
+  forgotPasswordOTPGeneralUser,
+  ChangePasswordForgetPassGeneralUser,
+  ChangePasswordGeneralUser,
 } from "./generalUser.controller";
 import { upload } from "../../multer/multer.upload";
 import { RoleCheckMiddleware } from "../../middlewares/roleGuard";
@@ -20,6 +23,19 @@ router.post("/register", registerGeneralUser);
 router.post("/verifyOtp", emailVerificationGeneralUser);
 router.post("/login", loginRateLimiter, logionGeneralUser);
 router.post("/resendOTP", otpRateLimiter, resendOTPGeneralUser);
-
-
+router.post(
+  "/forgotPasswordOTP",
+  forgotPasswordRateLimiter,
+  forgotPasswordOTPGeneralUser
+);
+router.post(
+  "/changePasswordForgetPass",
+  verifyTokenMiddleware,
+  ChangePasswordForgetPassGeneralUser
+);
+router.post(
+  "/changePassword",
+  verifyTokenMiddleware,
+  ChangePasswordGeneralUser
+);
 export const generalUserRoutes = router;

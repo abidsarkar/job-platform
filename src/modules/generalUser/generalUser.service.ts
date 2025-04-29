@@ -272,3 +272,155 @@ export const resendOTPGeneralUserService = async (email: string) => {
     otp, // Return the generated OTP
   };
 };
+//forgot password service
+export const forgotPasswordOTPGeneralUserService = async (email: string) => {
+  // 1. Check if the user exists
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+
+  // 2. Generate OTP
+  const otp = generateOTP(); // Generate OTP
+  const otpExpiresAt = await otpExpireTime(); // Get the OTP expiration time
+
+  // 3. Update the OTP and expiration time in the user's document
+  user.otp = otp;
+  user.otpExpiresAt = otpExpiresAt;
+  user.isForgotPasswordVerified = false; // Set the forgot password verification flag to true
+  // Save the user document with the new OTP and expiration time
+  await user.save();
+
+  // 4. Send OTP email to the user
+  await sendForgotPasswordOTPEmail(email, otp, user.name);
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
+  };
+};
+//password change for forgot password user
+export const changePasswordForgetPassGeneralUserService = async (
+  email: string,
+  password: string,
+  confirmPassword: string
+) => {
+  // 1. Check if the user exists
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  if (!user.isForgotPasswordVerified) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "User  not verified OTP for forgot password."
+    );
+  }
+  // 2.password validation
+  if (!password || !confirmPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password are required."
+    );
+  }
+  if (password.length < 6) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password must be at least 6 characters long."
+    );
+  }
+  // Check if password and confirm password match
+  if (password !== confirmPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password do not match."
+    );
+  }
+  // 3. Hash the new password
+  const hashedPassword = await hashPassword(password);
+  user.password = hashedPassword; // Update the password in the user document
+  user.isForgotPasswordVerified = false; // Reset the forgot password verification flag
+  user.otp = null; // Clear OTP after successful verification
+  await user.save();
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
+  };
+};
+export const changePasswordGeneralUserService = async (
+  email: string,
+  currentPassword: string,
+  newPassword: string,
+  confirmNewPassword: string
+) => {
+  // 1. Check if the user exists
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  const storedPassword = user.password;
+  if (!storedPassword) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "User Not verified");
+  }
+  //2. check if current password is correct
+  const isPasswordValid = await verifyPassword(currentPassword, storedPassword);
+  if (!isPasswordValid) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Current Password is not correct"
+    );
+  }
+  // 3.both password same
+  if (!newPassword || !confirmNewPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password are required."
+    );
+  }
+  if (newPassword.length < 6) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password must be at least 6 characters long."
+    );
+  }
+  // Check if password and confirm password match
+  if (newPassword !== confirmNewPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password do not match."
+    );
+  }
+  // 3. Hash the new password
+  const hashedPassword = await hashPassword(newPassword);
+  user.password = hashedPassword; // Update the password in the user document
+  user.isForgotPasswordVerified = false; // Reset the forgot password verification flag
+  user.otp = null; // Clear OTP after successful verification
+  await user.save();
+
+  // 5. Generate a JWT token for the user after successful OTP generation
+  const token = generateToken({
+    id: user._id.toString(),
+    role: user.role,
+    email: user.email,
+  });
+
+  // 6. Return the OTP and token in the response
+  return {
+    token, // Return the generated token
+  };
+};
