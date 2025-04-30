@@ -27,7 +27,11 @@ export const verifyTokenMiddleware = (req: Request, res: Response, next: NextFun
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as DecodedToken;
 
     // Attach the decoded payload to the request object
-    req.user = decoded;
+    req.user = {
+      id:decoded.id,
+      email:decoded.email,
+      role:decoded.role,
+    };
 
     next(); // Proceed to the next middleware or route handler
   } catch (error) {

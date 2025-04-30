@@ -30,7 +30,7 @@ export const registerGeneralUser = catchAsync(
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
-      statusCode: httpStatus.OK,
+      statusCode: httpStatus.CREATED,
       success: true,
       message:
         "OTP sent to your email. Please verify to continue registration.",
@@ -48,7 +48,7 @@ export const emailVerificationGeneralUser = catchAsync(
     );
     sendCookie(res, token);
     sendResponse(res, {
-      statusCode: httpStatus.OK, // Status code for successful login
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
       success: true, // Indicates success
       message: message, // Message to be sent in the response
       data: {
@@ -89,7 +89,7 @@ export const resendOTPGeneralUser = catchAsync(
     const { token } = await resendOTPGeneralUserService(email);
     sendCookie(res, token);
     sendResponse(res, {
-      statusCode: httpStatus.OK, // Status code for successful login
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
@@ -106,7 +106,7 @@ export const forgotPasswordOTPGeneralUser = catchAsync(
     const { token } = await forgotPasswordOTPGeneralUserService(email);
     sendCookie(res, token);
     sendResponse(res, {
-      statusCode: httpStatus.OK, // Status code for successful login
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
@@ -156,3 +156,15 @@ export const ChangePasswordGeneralUser = catchAsync(
     });
   }
 );
+export const logout = catchAsync(
+  async(req:Request,res:Response)=>{
+  
+    res.cookie("accessToken", "", {
+      httpOnly: true, // Makes the cookie accessible only to HTTP requests
+      secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
+      maxAge: 0, // Expire the cookie immediately
+      sameSite: "none", // Ensure cookie is sent in cross-origin requests
+    });
+
+  }
+)

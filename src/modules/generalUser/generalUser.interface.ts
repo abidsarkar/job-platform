@@ -2,18 +2,7 @@ import mongoose, { Document } from "mongoose";
 import { TRole } from "../../config/role"; // Assuming TRole is imported from somewhere
 
 // Enum for Gender, Marital Status, and Job Alert Role for better type safety
-export enum Gender {
-  Male = "Male",
-  Female = "Female",
-  Other = "Other",
-}
 
-export enum MaritalStatus {
-  Single = "Single",
-  Married = "Married",
-  Divorced = "Divorced",
-  Widowed = "Widowed",
-}
 
 export enum JobAlertRole {
   Developer = "Developer",

@@ -502,7 +502,7 @@ export const getSelfInfo = catchAsync(async (req: Request, res: Response) => {
 
 export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   try {
-    const id = req.query?.id as string;
+    const id = req.quepry?.id as string;
 
     const deleteableuser = await findUserById(id);
 

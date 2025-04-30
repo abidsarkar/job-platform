@@ -11,6 +11,7 @@ import {
   resendOTPEmail,
   sendForgotPasswordOTPEmail,
   sendCookie,
+  findUserByEmail,
 } from "./generalUser.utils"; // Utility to generate OTP
 import {
   generateRegisterToken,
@@ -22,6 +23,12 @@ import httpStatus, { ACCEPTED } from "http-status";
 
 import { OTP_EXPIRE_TIME, Nodemailer_GMAIL } from "../../config/index";
 import { string } from "zod";
+import {
+  JobSeekersPersonal,
+  JobSeekersProfile,
+  JobSeekersAccountSetting,
+  JobSeekersSocialMedia,
+} from "../jobSeekerUser/jobSeekerUser.model";
 // Register user service (handles OTP and registration)
 export const registerGeneralUserService = async (
   name: string,
@@ -97,9 +104,30 @@ export const registerGeneralUserService = async (
   });
 
   await newUser.save(); // Save user with OTP
+  const user = await generalUser.findOne({ email });
+  if (user?.role === "jobSeeker") {
+    const newJobSeekersPersonal = new JobSeekersPersonal({
+      userId: user._id,
+    });
+    await newJobSeekersPersonal.save();
+    const newJobSeekersProfile = new JobSeekersProfile({
+      userId: user._id,
+    });
+    await newJobSeekersProfile.save();
 
+    const newJobSeekersAccountSetting = new JobSeekersAccountSetting({
+      userId: user._id,
+    });
+    await newJobSeekersAccountSetting.save();
+
+    const newJobSeekersSocialMedia = new JobSeekersSocialMedia({
+      userId: user._id,
+    });
+    await newJobSeekersSocialMedia.save();
+  }
   // Send OTP to the user's email
   await sendOTPEmailRegister(name, email, otp);
+  //save the ref id to other model
 
   // Return OTP and token for registration process
   return { otp, token };
@@ -163,8 +191,8 @@ export const otpVerificationGeneralUserService = async (
     },
   };
 };
-//login and send role according to the user 
-//profile info not send yet after login 
+//login and send role according to the user
+//profile info not send yet after login
 export const loginGeneralUserService = async (
   email: string,
   password: string
@@ -212,7 +240,7 @@ export const loginGeneralUserService = async (
     return {
       token,
       message: `Your Account is under Processing for verification please Wait A moment. Or contact ${Nodemailer_GMAIL} for Farther Query`,
-      ACCEPTED_BY_ADMIN:false,
+      ACCEPTED_BY_ADMIN: false,
       role: user.role.toString(),
       user: {
         id: user._id,
@@ -221,12 +249,12 @@ export const loginGeneralUserService = async (
         userRole: user.role,
       },
     };
-  }else{
+  } else {
     return {
       token,
       role: user.role.toString(),
-      message:"Login Successful",
-      ACCEPTED_BY_ADMIN:true,
+      message: "Login Successful",
+      ACCEPTED_BY_ADMIN: true,
       user: {
         id: user._id,
         name: user.name,
@@ -235,7 +263,6 @@ export const loginGeneralUserService = async (
       },
     };
   }
-  
 };
 //resend otp
 export const resendOTPGeneralUserService = async (email: string) => {

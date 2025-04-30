@@ -8,8 +8,9 @@ import {
   forgotPasswordOTPGeneralUser,
   ChangePasswordForgetPassGeneralUser,
   ChangePasswordGeneralUser,
+  logout,
 } from "./generalUser.controller";
-import { upload } from "../../multer/multer.upload";
+import { profilePictureUpload } from "../../multer/multer.upload";
 import { RoleCheckMiddleware } from "../../middlewares/roleGuard";
 import { verifyTokenMiddleware } from "../../middlewares/verifyTokenMiddleware";
 import {
@@ -38,4 +39,5 @@ router.post(
   verifyTokenMiddleware,
   ChangePasswordGeneralUser
 );
+router.post("/logout", logout);
 export const generalUserRoutes = router;

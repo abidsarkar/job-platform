@@ -34,7 +34,7 @@ export function generateToken({
   return sign({ id, role, email }, JWT_SECRET_KEY as string, {
     expiresIn: "7d",
   });
-}
+}   
 export function verifySocketToken(token: string) {
   try {
     return verify(token, secret) as TokenData;
