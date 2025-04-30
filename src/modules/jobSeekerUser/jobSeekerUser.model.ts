@@ -15,21 +15,36 @@ const jobSeekerPersonalSchema = new Schema<IJobSeekerPersonal>({
   education: { type: String, required: false },
   personalWebsite: { type: String, required: false },
   profilePicture: {
-    filePathURL: { type: String,default:"/uploads/profile_pictures/1745471655982-763482898.jpg", required: false },
-    fileOriginalName: { type: String,default:"defaultProfilePictureAADD.jpg", required: false },
-    fileServerName: { type: String,default:
-      "1745471655982-763482898.jpg", required: false },
+    filePathURL: {
+      type: String,
+      default: "/uploads/profile_pictures/1745471655982-763482898.jpg",
+      required: false,
+    },
+    fileOriginalName: {
+      type: String,
+      default: "defaultProfilePictureAADD.jpg",
+      required: false,
+    },
+    fileServerName: {
+      type: String,
+      default: "1745471655982-763482898.jpg",
+      required: false,
+    },
+    pathA: { type: String, required: false },
   },
-  resume:{
+  resume: {
     fileName: { type: String, required: false },
     filePath: { type: String, required: false },
     publicFileURL: { type: String, required: false },
   },
-  
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "generalUser", required: true }, // Reference to the JobSeekerUser model
+  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  email: { type: String, required: false },
 });
 
-const JobSeekersPersonal = mongoose.model<IJobSeekerPersonal>("JobSeekersPersonal", jobSeekerPersonalSchema);
+const JobSeekersPersonal = mongoose.model<IJobSeekerPersonal>(
+  "JobSeekersPersonal",
+  jobSeekerPersonalSchema
+);
 
 // Personal Information Schema
 const JobSeekersProfileSchema = new Schema<IJobSeekerProfile>({
@@ -42,35 +57,47 @@ const JobSeekersProfileSchema = new Schema<IJobSeekerProfile>({
     required: false,
   },
   biography: { type: String, required: false },
- userId: { type: mongoose.Schema.Types.ObjectId, ref: "generalUser", required: true }, // Reference to the JobSeekerUser model
-
+  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  email: { type: String, required: false },
 });
 
-const JobSeekersProfile = mongoose.model<IJobSeekerProfile>("JobSeekersProfile", JobSeekersProfileSchema);
+const JobSeekersProfile = mongoose.model<IJobSeekerProfile>(
+  "JobSeekersProfile",
+  JobSeekersProfileSchema
+);
 
 const JobSeekersAccountSettingSchema = new Schema<IJobSeekerAccountSettings>({
-  fullAddress:{type:String,required:false},
-  city:{type:String,required:false},
-  phoneNumber:{type:String,required:false},
-  jobAlertRole:{type:String,required:false},
-  jobAlertCity:{type:String,required:false},
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "generalUser", required: true }, // Reference to the JobSeekerUser model
-})
-const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>("JobSeekersAccountSetting", JobSeekersAccountSettingSchema);
+  fullAddress: { type: String, required: false },
+  city: { type: String, required: false },
+  phoneNumber: { type: String, required: false },
+  jobAlertRole: { type: String, required: false },
+  jobAlertCity: { type: String, required: false },
+  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  email: { type: String, required: false },
+});
+const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>(
+  "JobSeekersAccountSetting",
+  JobSeekersAccountSettingSchema
+);
 
 // Social Media Schema
 const JobSeekersSocialMediaSchema = new Schema<IJobSeekerSocialMedia>({
-  
   facebookLink: { type: String, required: false },
   xLink: { type: String, required: false },
   instagramLink: { type: String, required: false },
   linkedinLink: { type: String, required: false },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "generalUser", required: true }, // Reference to the JobSeekerUser model
+  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  email: { type: String, required: false },
 });
 
-const JobSeekersSocialMedia = mongoose.model<IJobSeekerSocialMedia>("JobSeekersSocialMedia", JobSeekersSocialMediaSchema);
+const JobSeekersSocialMedia = mongoose.model<IJobSeekerSocialMedia>(
+  "JobSeekersSocialMedia",
+  JobSeekersSocialMediaSchema
+);
 
-
-
-export { JobSeekersPersonal,JobSeekersProfile, JobSeekersAccountSetting, JobSeekersSocialMedia };
-
+export {
+  JobSeekersPersonal,
+  JobSeekersProfile,
+  JobSeekersAccountSetting,
+  JobSeekersSocialMedia,
+};

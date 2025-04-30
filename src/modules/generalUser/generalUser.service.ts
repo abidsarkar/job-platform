@@ -108,20 +108,27 @@ export const registerGeneralUserService = async (
   if (user?.role === "jobSeeker") {
     const newJobSeekersPersonal = new JobSeekersPersonal({
       userId: user._id,
+      email:user.email
     });
     await newJobSeekersPersonal.save();
     const newJobSeekersProfile = new JobSeekersProfile({
       userId: user._id,
+      email:user.email
+
     });
     await newJobSeekersProfile.save();
 
     const newJobSeekersAccountSetting = new JobSeekersAccountSetting({
       userId: user._id,
+      email:user.email
+
     });
     await newJobSeekersAccountSetting.save();
 
     const newJobSeekersSocialMedia = new JobSeekersSocialMedia({
       userId: user._id,
+      email:user.email
+
     });
     await newJobSeekersSocialMedia.save();
   }
