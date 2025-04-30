@@ -27,9 +27,10 @@ export interface IJobSeekerPersonal extends Document {
   };
   // CV
   resume?: {
-    fileName: string;
-    filePath: string;
-    publicFileURL: string;
+    fileOriginalName: string;
+    fileServerName: string;
+    filePathURL: string;
+    pathA: string;
   };
   userId?: string; // Reference to JobSeekerUser model
   email: string;

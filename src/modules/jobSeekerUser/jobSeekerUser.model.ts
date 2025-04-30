@@ -33,9 +33,10 @@ const jobSeekerPersonalSchema = new Schema<IJobSeekerPersonal>({
     pathA: { type: String, required: false },
   },
   resume: {
-    fileName: { type: String, required: false },
-    filePath: { type: String, required: false },
-    publicFileURL: { type: String, required: false },
+    fileOriginalName: { type: String, required: false },
+    fileServerName: { type: String, required: false },
+    filePathURL: { type: String, required: false },
+    pathA: { type: String, required: false },
   },
   userId: { type: String, required: true }, // Reference to the JobSeekerUser model
   email: { type: String, required: false },

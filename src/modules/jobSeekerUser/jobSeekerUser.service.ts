@@ -104,7 +104,7 @@ export const profilePictureUploadService = async (
     const oldFilePath = userProfile.profilePicture.pathA;
     // Check if the file exists and delete it
     if (fs.existsSync(oldFilePath)) {
-      console.log("file is existed")
+      // console.log("file is existed")
       fs.unlinkSync(oldFilePath); // Delete the file from the filesystem
     }
   }
@@ -112,8 +112,46 @@ export const profilePictureUploadService = async (
   userProfile.profilePicture = {
     filePathURL, // URL to access the image
     fileOriginalName, // Original file name
-    fileServerName, 
-    pathA// Server file name (the actual file stored in the filesystem)
+    fileServerName,
+    pathA, // Server file name (the actual file stored in the filesystem)
+  };
+
+  // Save the updated user profile
+  await userProfile.save();
+
+  return userProfile; // Return the updated profile
+};
+//resume upload service
+export const resumeUploadService = async (
+  email: string,
+  fileOriginalName: string,
+  fileServerName: string,
+  filePathURL: string,
+  pathA: string
+) => {
+  // Find the job seeker profile by email
+  const userProfile = await JobSeekersPersonal.findOne({ email });
+  if (!userProfile) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Job seeker profile not found.");
+  }
+  if (userProfile.resume?.fileOriginalName) {
+    const oldFilePath = userProfile.resume.pathA;
+    // Check if the file exists and delete it
+    if (fs.existsSync(oldFilePath)) {
+      // console.log("file is existed")
+      fs.unlinkSync(oldFilePath); // Delete the file from the filesystem
+    }
+    else {
+      console.log("No previous resume found, skipping deletion.");
+    }
+  }
+
+  // Update the profile picture fields in the user's profile
+  userProfile.resume = {
+    filePathURL, // URL to access the image
+    fileOriginalName, // Original file name
+    fileServerName,
+    pathA, // Server file name (the actual file stored in the filesystem)
   };
 
   // Save the updated user profile

@@ -1,7 +1,7 @@
 import express from "express";
 
-import { updateProfileInformationJobSeekersUser } from "./jobSeekerUser.controller";
-import { profilePictureUpload } from "../../multer/multer.upload";
+import { updateProfileInformationJobSeekersUser,resumeUpdateJobSeekersUser } from "./jobSeekerUser.controller";
+import { profilePictureUpload,cvUpload } from "../../multer/multer.upload";
 import { roleCheckMiddleware } from "../../middlewares/roleCheckMiddleware";
 import { verifyTokenMiddleware } from "../../middlewares/verifyTokenMiddleware";
 import {
@@ -17,6 +17,13 @@ router.post(
   roleCheckMiddleware("jobSeeker"),
   profilePictureUpload,
   updateProfileInformationJobSeekersUser
+);
+router.post(
+  "/resumeUpload",
+  verifyTokenMiddleware,
+  roleCheckMiddleware("jobSeeker"),
+  cvUpload,
+  resumeUpdateJobSeekersUser
 );
 
 export const jobSeekerUserRoutes = router;
