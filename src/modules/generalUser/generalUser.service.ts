@@ -102,40 +102,17 @@ export const registerGeneralUserService = async (
     role: validRole,
     isActiveAccount,
   });
-
-  await newUser.save(); // Save user with OTP
-  const user = await generalUser.findOne({ email });
-  if (user?.role === "jobSeeker") {
-    const newJobSeekersPersonal = new JobSeekersPersonal({
-      userId: user._id,
-      email:user.email
-    });
-    await newJobSeekersPersonal.save();
-    const newJobSeekersProfile = new JobSeekersProfile({
-      userId: user._id,
-      email:user.email
-
-    });
-    await newJobSeekersProfile.save();
-
-    const newJobSeekersAccountSetting = new JobSeekersAccountSetting({
-      userId: user._id,
-      email:user.email
-
-    });
-    await newJobSeekersAccountSetting.save();
-
-    const newJobSeekersSocialMedia = new JobSeekersSocialMedia({
-      userId: user._id,
-      email:user.email
-
-    });
-    await newJobSeekersSocialMedia.save();
-  }
   // Send OTP to the user's email
   await sendOTPEmailRegister(name, email, otp);
-  //save the ref id to other model
-
+  await newUser.save(); // Save user with OTP
+  if (validRole === Role.jobSeeker) {
+    await Promise.all([
+      JobSeekersPersonal.create({ userId: newUser._id, email }),
+      JobSeekersProfile.create({ userId: newUser._id, email }),
+      JobSeekersAccountSetting.create({ userId: newUser._id, email }),
+      JobSeekersSocialMedia.create({ userId: newUser._id, email }),
+    ]);
+  }
   // Return OTP and token for registration process
   return { otp, token };
 };

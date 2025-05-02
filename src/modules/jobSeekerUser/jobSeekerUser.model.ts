@@ -10,10 +10,10 @@ import {
 
 // Job Information Schema
 const jobSeekerPersonalSchema = new Schema<IJobSeekerPersonal>({
-  jobTitle: { type: String, required: false },
-  experience: { type: String, required: false },
-  education: { type: String, required: false },
-  personalWebsite: { type: String, required: false },
+  jobTitle: { type: String,default:null, required: false },
+  experience: { type: String,default:null, required: false },
+  education: { type: String,default:null, required: false },
+  personalWebsite: { type: String,default:null, required: false },
   profilePicture: {
     filePathURL: {
       type: String,
@@ -38,7 +38,7 @@ const jobSeekerPersonalSchema = new Schema<IJobSeekerPersonal>({
     filePathURL: { type: String, required: false },
     pathA: { type: String, required: false },
   },
-  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  userId: { type: mongoose.Types.ObjectId, ref:"generalUser"}, // Reference to the JobSeekerUser model
   email: { type: String, required: false },
 });
 
@@ -49,16 +49,17 @@ const JobSeekersPersonal = mongoose.model<IJobSeekerPersonal>(
 
 // Personal Information Schema
 const JobSeekersProfileSchema = new Schema<IJobSeekerProfile>({
-  nationality: { type: String, required: false },
-  dob: { type: Date, required: false },
+  nationality: { type: String,default:null, required: false },
+  dob: { type: Date, default:null, required: false },
   gender: { type: String, enum: Object.values(Gender), required: false },
   maritalStatus: {
     type: String,
     enum: Object.values(MaritalStatus),
+    default:null, 
     required: false,
   },
-  biography: { type: String, required: false },
-  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  biography: { type: String, default:null, required: false },
+  userId: { type: mongoose.Types.ObjectId, ref:"generalUser"}, // Reference to the JobSeekerUser model
   email: { type: String, required: false },
 });
 
@@ -68,12 +69,12 @@ const JobSeekersProfile = mongoose.model<IJobSeekerProfile>(
 );
 
 const JobSeekersAccountSettingSchema = new Schema<IJobSeekerAccountSettings>({
-  fullAddress: { type: String, required: false },
-  city: { type: String, required: false },
-  phoneNumber: { type: String, required: false },
-  jobAlertRole: { type: String, required: false },
-  jobAlertCity: { type: String, required: false },
-  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  fullAddress: { type: String, default:null, required: false },
+  city: { type: String,default:null,  required: false },
+  phoneNumber: { type: String,default:null,  required: false },
+  jobAlertRole: { type: String,default:null,  required: false },
+  jobAlertCity: { type: String,default:null,  required: false },
+  userId: { type: mongoose.Types.ObjectId, ref:"generalUser"},// Reference to the JobSeekerUser model
   email: { type: String, required: false },
 });
 const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>(
@@ -83,11 +84,11 @@ const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>(
 
 // Social Media Schema
 const JobSeekersSocialMediaSchema = new Schema<IJobSeekerSocialMedia>({
-  facebookLink: { type: String, required: false },
-  xLink: { type: String, required: false },
-  instagramLink: { type: String, required: false },
-  linkedinLink: { type: String, required: false },
-  userId: { type: String, required: true }, // Reference to the JobSeekerUser model
+  facebookLink: { type: String,default:null,  required: false },
+  xLink: { type: String, default:null, required: false },
+  instagramLink: { type: String,default:null,  required: false },
+  linkedinLink: { type: String,default:null,  required: false },
+  userId: { type: mongoose.Types.ObjectId, ref:"generalUser"},// Reference to the JobSeekerUser model
   email: { type: String, required: false },
 });
 

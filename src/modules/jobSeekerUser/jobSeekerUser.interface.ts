@@ -14,10 +14,10 @@ export enum MaritalStatus {
 // Job Information Interface
 export interface IJobSeekerPersonal extends Document {
   _id: mongoose.Types.ObjectId; // Make sure it's a valid ObjectId reference
-  jobTitle?: string;
-  experience?: string;
-  education?: string;
-  personalWebsite?: string;
+  jobTitle?: string | null;
+  experience?: string | null;
+  education?: string | null;
+  personalWebsite?: string | null;
   //profile picture
   profilePicture?: {
     filePathURL: string;
@@ -32,38 +32,38 @@ export interface IJobSeekerPersonal extends Document {
     filePathURL: string;
     pathA: string;
   };
-  userId?: string; // Reference to JobSeekerUser model
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
   email: string;
 }
 
 // Personal Information Interface
 export interface IJobSeekerProfile extends Document {
   _id: mongoose.Types.ObjectId;
-  nationality?: string;
-  dob?: Date;
-  gender?: Gender;
-  maritalStatus?: MaritalStatus;
-  biography?: string;
-  userId?: string; // Reference to JobSeekerUser model
+  nationality?: string | null;
+  dob?: Date | null;
+  gender?: Gender | null;
+  maritalStatus?: MaritalStatus | null;
+  biography?: string | null;
+  userId?: mongoose.Types.ObjectId ; // Reference to JobSeekerUser model
   email: string;
 }
 export interface IJobSeekerAccountSettings extends Document {
   _id: mongoose.Types.ObjectId;
-  fullAddress?: string;
-  city?: string;
-  phoneNumber?: string;
-  jobAlertRole?: string;
-  jobAlertCity?: string;
-  userId?: string; // Reference to JobSeekerUser model
+  fullAddress?: string | null;
+  city?: string | null;
+  phoneNumber?: string | null;
+  jobAlertRole?: string | null;
+  jobAlertCity?: string | null;
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
   email: string;
 }
 // Social Media Information Interface
 export interface IJobSeekerSocialMedia extends Document {
   _id: mongoose.Types.ObjectId;
-  facebookLink?: string;
-  xLink?: string;
-  instagramLink?: string;
-  linkedinLink?: string;
-  userId?: string; // Reference to JobSeekerUser model
+  facebookLink?: string | null;
+  xLink?: string | null;
+  instagramLink?: string | null;
+  linkedinLink?: string | null;
+  userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
   email: string;
 }

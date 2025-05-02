@@ -11,7 +11,7 @@ import {
 } from "../../middlewares/rateLimiter";
 const router = express.Router();
 
-router.post(
+router.patch(
   "/updateProfilePicture",
   verifyTokenMiddleware,
   roleCheckMiddleware("jobSeeker"),

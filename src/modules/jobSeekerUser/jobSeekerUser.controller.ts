@@ -40,17 +40,20 @@ export const updateProfileInformationJobSeekersUser = catchAsync(
         pathA
       );
     }
-
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      name: name || undefined, // Only update if provided
+      jobTitle: jobTitle || undefined,
+      experience: experience || undefined,
+      education: education || undefined,
+      personalWebsite: personalWebsite || undefined,
+    };
     //send data to update information
     const { token, data } = await updateProfileInformationJobSeekersService(
       id,
       email,
       role,
-      name,
-      jobTitle,
-      experience,
-      education,
-      personalWebsite
+      updatedData
     );
     sendCookie(res, token);
     // Send the response back to the client
