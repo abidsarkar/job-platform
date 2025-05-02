@@ -222,7 +222,6 @@ export const updateProfileInformationJobSeekersService = async (
   if (!jobSeekerProfile) {
     throw new ApiError(httpStatus.NOT_FOUND, "Job seeker profile not found.");
   }
-  console.log(updatedData)
   // 3. Update the profile with the provided data (check if data has changed before updating)
   if (
     updatedData.nationality &&
@@ -264,4 +263,29 @@ export const updateProfileInformationJobSeekersService = async (
     token,
     data: jobSeekerProfile.toObject(), // Convert Mongoose document to plain object (remove Mongoose methods)
   };
+};
+//get profile information service
+export const getProfileInformationServices = async (
+  id: string,
+  email: string,
+  role: string
+) => {
+  // 1. Check if the user exists
+
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  const jobSeekerProfile = await JobSeekersProfile.findOne({ email })
+    .populate("userId", "-password") // Populate the user field with user data from the generalUser model
+    .exec();
+  if (!jobSeekerProfile) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Job seeker not found.");
+  }
+  const token = generateToken({
+    id: id,
+    role: role,
+    email: email,
+  });
+  return { token, data: jobSeekerProfile };
 };

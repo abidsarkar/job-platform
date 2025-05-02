@@ -5,6 +5,7 @@ import {
   resumeUpdateJobSeekersUser,
   getPersonalProfileJobSeekersUser,
   updateProfileInformationJobSeekersUser,
+  getProfileInformationJobSeekersUser,
 } from "./jobSeekerUser.controller";
 import { profilePictureUpload, cvUpload } from "../../multer/multer.upload";
 import { roleCheckMiddleware } from "../../middlewares/roleCheckMiddleware";
@@ -46,7 +47,7 @@ router.get(
   "/profile", // This route is for fetching job seeker profile
   verifyTokenMiddleware, // Ensure the user is authenticated
   roleCheckMiddleware("jobSeeker"), // Ensure the user has the correct role
-  updateProfileInformationJobSeekersUser // Controller to handle the GET request
+  getProfileInformationJobSeekersUser // Controller to handle the GET request
 );
 
 export const jobSeekerUserRoutes = router;

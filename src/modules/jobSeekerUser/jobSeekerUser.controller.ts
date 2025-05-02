@@ -4,8 +4,8 @@ import {
   profilePictureUploadService,
   resumeUploadService,
   getPersonalInformationServices,
-  updateProfileInformationJobSeekersService
-  
+  updateProfileInformationJobSeekersService,
+  getProfileInformationServices,
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -65,7 +65,7 @@ export const updatePersonalInformationJobSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "profile information is updated", // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         data,
       },
     });
@@ -109,8 +109,8 @@ export const resumeUpdateJobSeekersUser = catchAsync(
 export const getPersonalProfileJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
-    const { role, email }: any = req.user;
-    const { id } = req.params;
+    const { id,role, email }: any = req.user;
+
 
     //send data to update information
     const { token, data } = await getPersonalInformationServices(
@@ -121,23 +121,23 @@ export const getPersonalProfileJobSeekersUser = catchAsync(
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
-      statusCode: httpStatus.ACCEPTED, // Status code for successful login
+      statusCode: httpStatus.OK, // Status code for successful login
       success: true, // Indicates success
       message: "successfully personal information gated", // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         data,
       },
     });
   }
 );
-//update profile information 
+//update profile information
 export const updateProfileInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
     const { id, role, email }: any = req.user;
     const { nationality, dob, gender, maritalStatus, biography } = req.body; // Data from request body
-console.log("the nationality is",nationality)
+
     // Update other profile information (without overwriting existing data if not provided)
     const updatedData = {
       nationality: nationality || undefined, // Only update if provided
@@ -160,10 +160,33 @@ console.log("the nationality is",nationality)
       success: true, // Indicates success
       message: "profile information is updated", // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         data,
       },
     });
   }
 );
-//get
+//get profile information
+export const getProfileInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id,role, email }: any = req.user;
+   
+    const { token, data } = await getProfileInformationServices(
+      id,
+      email,
+      role
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "successfully personal information gated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//update
