@@ -3,6 +3,7 @@ import {
   updateProfileInformationJobSeekersService,
   profilePictureUploadService,
   resumeUploadService,
+  getPersonalInformationServices,
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -13,7 +14,7 @@ import ApiError from "../../errors/ApiError";
 import { sendCookie } from "../generalUser/generalUser.utils";
 
 const path = require("path");
-
+// update profile information
 export const updateProfileInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
@@ -62,12 +63,13 @@ export const updateProfileInformationJobSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "profile information is updated", // Message to be sent in the response
       data: {
-        token, // Send the JWT token
+        accessToken:token, // Send the JWT token
         data,
       },
     });
   }
 );
+//upload resume
 export const resumeUpdateJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
@@ -98,6 +100,32 @@ export const resumeUpdateJobSeekersUser = catchAsync(
       success: true, // Indicates success
       message: "resume upload successful", // Message to be sent in the response
       data: {},
+    });
+  }
+);
+//get the personal profile information
+export const getPersonalProfileJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    // Extract user data from req.user (set by the verifyTokenMiddleware)
+    const { role, email }: any = req.user;
+    const { id } = req.params;
+
+    //send data to update information
+    const { token, data } = await getPersonalInformationServices(
+      id,
+      email,
+      role
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
+      success: true, // Indicates success
+      message: "successfully personal information gated", // Message to be sent in the response
+      data: {
+        accessToken:token, // Send the JWT token
+        data,
+      },
     });
   }
 );

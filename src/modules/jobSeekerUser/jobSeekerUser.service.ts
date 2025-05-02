@@ -49,7 +49,7 @@ export const updateProfileInformationJobSeekersService = async (
     .populate("userId", "-password") // Populate the user field with user data from the generalUser model
     .exec();
   //console.log(jobSeekerPersonal)
- 
+
   if (!jobSeekerPersonal) {
     throw new ApiError(httpStatus.NOT_FOUND, "Job seeker not found.");
   }
@@ -95,6 +95,7 @@ export const updateProfileInformationJobSeekersService = async (
     },
   };
 };
+//profile picture upload
 export const profilePictureUploadService = async (
   email: string,
   fileOriginalName: string,
@@ -176,4 +177,29 @@ export const resumeUploadService = async (
   await userProfile.save();
 
   return userProfile; // Return the updated profile
+};
+//get personal information service
+export const getPersonalInformationServices = async (
+  id: string,
+  email: string,
+  role: string
+) => {
+ // 1. Check if the user exists
+ const user = await generalUser.findOne({ email });
+ if (!user) {
+   throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+ }
+ const jobSeekerPersonal = await JobSeekersPersonal.findOne({ email })
+    .populate("userId", "-password") // Populate the user field with user data from the generalUser model
+    .exec();
+    if (!jobSeekerPersonal) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Job seeker not found.");
+    }
+    const token = generateToken({
+      id: id,
+      role: role,
+      email: email,
+    });
+  return {token,
+    data:jobSeekerPersonal};
 };

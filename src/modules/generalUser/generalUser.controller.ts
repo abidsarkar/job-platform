@@ -52,7 +52,7 @@ export const emailVerificationGeneralUser = catchAsync(
       success: true, // Indicates success
       message: message, // Message to be sent in the response
       data: {
-        token, // Send the JWT token
+        accessToken:token, // Send the JWT token
         user, // Send the user data (excluding password)
       },
     });
@@ -93,7 +93,7 @@ export const resendOTPGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
-        token, // Send the JWT token
+        accessToken:token, // Send the JWT token
         // Send the user data (excluding password)
       },
     });
@@ -110,7 +110,7 @@ export const forgotPasswordOTPGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
-        token, // Send the JWT token
+        accessToken:token, // Send the JWT token
       },
     });
   }
@@ -129,7 +129,7 @@ export const ChangePasswordForgetPassGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "Password Change Successful", // Message to be sent in the response
       data: {
-        token,
+        accessToken:token,
       },
     });
   }
@@ -151,7 +151,7 @@ export const ChangePasswordGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "Password Change Successful", // Message to be sent in the response
       data: {
-        token: token,
+        accessToken: token,
       },
     });
   }
@@ -162,7 +162,7 @@ export const logout = catchAsync(
     res.cookie("accessToken", "", {
       httpOnly: true, // Makes the cookie accessible only to HTTP requests
       secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
-      maxAge: 0, // Expire the cookie immediately
+      maxAge: 1, // Expire the cookie immediately
       sameSite: "none", // Ensure cookie is sent in cross-origin requests
     });
 
