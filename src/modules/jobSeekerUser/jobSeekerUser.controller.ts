@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import {
-  updateProfileInformationJobSeekersService,
+  updatePersonalInformationJobSeekersService,
   profilePictureUploadService,
   resumeUploadService,
   getPersonalInformationServices,
+  updateProfileInformationJobSeekersService
+  
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -14,8 +16,8 @@ import ApiError from "../../errors/ApiError";
 import { sendCookie } from "../generalUser/generalUser.utils";
 
 const path = require("path");
-// update profile information
-export const updateProfileInformationJobSeekersUser = catchAsync(
+// update personal information
+export const updatePersonalInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
     const { id, role, email }: any = req.user;
@@ -50,7 +52,7 @@ export const updateProfileInformationJobSeekersUser = catchAsync(
       personalWebsite: personalWebsite || undefined,
     };
     //send data to update information
-    const { token, data } = await updateProfileInformationJobSeekersService(
+    const { token, data } = await updatePersonalInformationJobSeekersService(
       id,
       email,
       role,
@@ -129,3 +131,39 @@ export const getPersonalProfileJobSeekersUser = catchAsync(
     });
   }
 );
+//update profile information 
+export const updateProfileInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    // Extract user data from req.user (set by the verifyTokenMiddleware)
+    const { id, role, email }: any = req.user;
+    const { nationality, dob, gender, maritalStatus, biography } = req.body; // Data from request body
+console.log("the nationality is",nationality)
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      nationality: nationality || undefined, // Only update if provided
+      dob: dob || undefined,
+      gender: gender || undefined,
+      maritalStatus: maritalStatus || undefined,
+      biography: biography || undefined,
+    };
+    //send data to update information
+    const { token, data } = await updateProfileInformationJobSeekersService(
+      id,
+      email,
+      role,
+      updatedData
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
+      success: true, // Indicates success
+      message: "profile information is updated", // Message to be sent in the response
+      data: {
+        accessToken:token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//get

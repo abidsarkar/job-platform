@@ -28,8 +28,8 @@ import httpStatus from "http-status";
 
 import { OTP_EXPIRE_TIME, Nodemailer_GMAIL } from "../../config/index";
 import { string } from "zod";
-//profile information update service
-export const updateProfileInformationJobSeekersService = async (
+//update personal profile information update service
+export const updatePersonalInformationJobSeekersService = async (
   id: string,
   email: string,
   role: string,
@@ -184,22 +184,84 @@ export const getPersonalInformationServices = async (
   email: string,
   role: string
 ) => {
- // 1. Check if the user exists
- const user = await generalUser.findOne({ email });
- if (!user) {
-   throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
- }
- const jobSeekerPersonal = await JobSeekersPersonal.findOne({ email })
+  // 1. Check if the user exists
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  const jobSeekerPersonal = await JobSeekersPersonal.findOne({ email })
     .populate("userId", "-password") // Populate the user field with user data from the generalUser model
     .exec();
-    if (!jobSeekerPersonal) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Job seeker not found.");
-    }
-    const token = generateToken({
-      id: id,
-      role: role,
-      email: email,
-    });
-  return {token,
-    data:jobSeekerPersonal};
+  if (!jobSeekerPersonal) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Job seeker not found.");
+  }
+  const token = generateToken({
+    id: id,
+    role: role,
+    email: email,
+  });
+  return { token, data: jobSeekerPersonal };
+};
+//update profile information
+export const updateProfileInformationJobSeekersService = async (
+  id: string,
+  email: string,
+  role: string,
+  updatedData: any // Accept updated data as an object
+) => {
+  // 1. Check if the user exists
+  const user = await generalUser.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+  }
+  // 2. Find the job seeker profile by email and populate the user field (exclude password)
+  const jobSeekerProfile = await JobSeekersProfile.findOne({ email })
+    .populate("userId", "-password") // Populate user data, excluding password
+    .exec();
+
+  if (!jobSeekerProfile) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Job seeker profile not found.");
+  }
+  console.log(updatedData)
+  // 3. Update the profile with the provided data (check if data has changed before updating)
+  if (
+    updatedData.nationality &&
+    updatedData.nationality !== jobSeekerProfile.nationality
+  ) {
+    jobSeekerProfile.nationality = updatedData.nationality;
+  }
+  if (updatedData.dob && updatedData.dob !== jobSeekerProfile.dob) {
+    jobSeekerProfile.dob = updatedData.dob;
+  }
+  if (updatedData.gender && updatedData.gender !== jobSeekerProfile.gender) {
+    jobSeekerProfile.gender = updatedData.gender;
+  }
+  if (
+    updatedData.maritalStatus &&
+    updatedData.maritalStatus !== jobSeekerProfile.maritalStatus
+  ) {
+    jobSeekerProfile.maritalStatus = updatedData.maritalStatus;
+  }
+  if (
+    updatedData.biography &&
+    updatedData.biography !== jobSeekerProfile.biography
+  ) {
+    jobSeekerProfile.biography = updatedData.biography;
+  }
+
+  // 4. Save the updated profile
+  await jobSeekerProfile.save();
+
+  // 5. Generate a new JWT token for the user
+  const token = generateToken({
+    id: id,
+    role: role,
+    email: email,
+  });
+
+  // 6. Return the updated profile data and token
+  return {
+    token,
+    data: jobSeekerProfile.toObject(), // Convert Mongoose document to plain object (remove Mongoose methods)
+  };
 };
