@@ -71,13 +71,15 @@ const JobSeekersProfile = mongoose.model<IJobSeekerProfile>(
 const JobSeekersAccountSettingSchema = new Schema<IJobSeekerAccountSettings>({
   fullAddress: { type: String, default:null, required: false },
   city: { type: String,default:null,  required: false },
+  state: { type: String,default:null,  required: false },
+  country: { type: String,default:null, required: false },
   phoneNumber: { type: String,default:null,  required: false },
   jobAlertRole: { type: String,default:null,  required: false },
   jobAlertCity: { type: String,default:null,  required: false },
   userId: { type: mongoose.Types.ObjectId, ref:"generalUser"},// Reference to the JobSeekerUser model
   email: { type: String, required: false },
 });
-const JobSeekersAccountSetting = mongoose.model<IJobSeekerProfile>(
+const JobSeekersAccountSetting = mongoose.model<IJobSeekerAccountSettings>(
   "JobSeekersAccountSetting",
   JobSeekersAccountSettingSchema
 );

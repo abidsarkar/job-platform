@@ -6,6 +6,11 @@ import {
   getPersonalInformationServices,
   updateProfileInformationJobSeekersService,
   getProfileInformationServices,
+  updateSocialMediaJobSeekersService,
+  getSocialMediaServices,
+  updateAccountJobSeekersService,
+  getAccountJobSeekersService,
+  getAllInformationJobSeekersService
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -109,8 +114,7 @@ export const resumeUpdateJobSeekersUser = catchAsync(
 export const getPersonalProfileJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
-    const { id,role, email }: any = req.user;
-
+    const { id, role, email }: any = req.user;
 
     //send data to update information
     const { token, data } = await getPersonalInformationServices(
@@ -169,8 +173,8 @@ export const updateProfileInformationJobSeekersUser = catchAsync(
 //get profile information
 export const getProfileInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
-    const { id,role, email }: any = req.user;
-   
+    const { id, role, email }: any = req.user;
+
     const { token, data } = await getProfileInformationServices(
       id,
       email,
@@ -189,4 +193,155 @@ export const getProfileInformationJobSeekersUser = catchAsync(
     });
   }
 );
-//update
+//update social media
+export const updateSocialMediaInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    // Extract user data from req.user (set by the verifyTokenMiddleware)
+    const { id, role, email }: any = req.user;
+    const { facebookLink, xLink, instagramLink, linkedinLink } = req.body; // Data from request body
+
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      facebookLink: facebookLink || undefined, // Only update if provided
+      xLink: xLink || undefined,
+      instagramLink: instagramLink || undefined,
+      linkedinLink: linkedinLink || undefined,
+    };
+    //send data to update information
+    const { token, data } = await updateSocialMediaJobSeekersService(
+      id,
+      email,
+      role,
+      updatedData
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
+      success: true, // Indicates success
+      message: "social media information is updated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//get social media 
+export const getSocialMediaInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id, role, email }: any = req.user;
+
+    const { token, data } = await getSocialMediaServices(
+      id,
+      email,
+      role
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "successfully social information gated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//update account 
+export const updateAccountInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    // Extract user data from req.user (set by the verifyTokenMiddleware)
+    const { id, role, email }: any = req.user;
+    const { fullAddress, phoneNumber,jobAlertRole ,jobAlertCity} = req.body; // Data from request body
+    if (!fullAddress) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Full address is required.");
+    }
+  
+    // Split the full address into city, state, and country using comma as delimiter
+    const addressParts = fullAddress.split(',');
+  
+    if (addressParts.length !== 3) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid address format. Please provide city, state, and country.");
+    }
+  
+    const [city, state, country] = addressParts.map((part: string) => part.trim()); // Trim spaces around the parts
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      fullAddress: fullAddress || undefined, // Only update if provided
+      city: city || undefined,
+      state: state || undefined,
+      country: country || undefined,
+      phoneNumber: phoneNumber || undefined,
+      jobAlertRole: jobAlertRole || undefined,
+      jobAlertCity: jobAlertCity || undefined,
+    };
+
+    //send data to update information
+    const { token, data } = await updateAccountJobSeekersService(
+      id,
+      email,
+      role,
+      updatedData
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.ACCEPTED, // Status code for successful login
+      success: true, // Indicates success
+      message: "Account information is updated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//get account
+export const getAccountInformationJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id, role, email }: any = req.user;
+
+    const { token, data } = await getAccountJobSeekersService(
+      id,
+      email,
+      role
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "successfully Account information gated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//get account
+export const getAllJobSeekersUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id, role, email }: any = req.user;
+
+    const { token, data } = await getAllInformationJobSeekersService(
+      id,
+      email,
+      role
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.OK, // Status code for successful login
+      success: true, // Indicates success
+      message: "full information", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
