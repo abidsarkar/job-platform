@@ -35,9 +35,17 @@ export interface IGeneralUser extends Document {
   isVerified?: boolean;
   isActiveAccount?: AccountStatus;
   isForgotPasswordVerified?: boolean;
-  // Reference fields
+  isDefaultAccount?:boolean;
+  defaultEmployerID?: mongoose.Types.ObjectId; // Reference to the default employer
   jobDetailsID?: mongoose.Types.ObjectId; // Reference to JobSeekersJob model
   personalInfoID?: mongoose.Types.ObjectId; // Reference to JobSeekersPersonalInfo model
   socialMediaID?: mongoose.Types.ObjectId; // Reference to JobSeekersSocialMedia model
+}
+export interface ISubEmployerUser extends Document{
+  _id:mongoose.Types.ObjectId;
+  defaultEmployerID:mongoose.Types.ObjectId;
+  defaultEmployerEmail:string;
+  email:string;
+  password:string;
 }
 

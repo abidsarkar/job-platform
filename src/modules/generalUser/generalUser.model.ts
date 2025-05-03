@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import {
-  IGeneralUser ,
+  IGeneralUser,
   Role,
-  AccountStatus
+  AccountStatus,
+  ISubEmployerUser,
 } from "./generalUser.interface"; // Import IUser Interface
 // User Schema for Job Seeker
 const generalUserSchema = new Schema<IGeneralUser>({
@@ -19,9 +20,21 @@ const generalUserSchema = new Schema<IGeneralUser>({
     default: "active",
   },
   isForgotPasswordVerified: { type: Boolean, default: false },
-  
+  isDefaultAccount: { type: Boolean },
+  defaultEmployerID: { type: Schema.Types.ObjectId, ref: "generalUser" },
 });
-const generalUser = mongoose.model<IGeneralUser>("generalUser", generalUserSchema);
-
-export {  generalUser};
-
+const generalUser = mongoose.model<IGeneralUser>(
+  "generalUser",
+  generalUserSchema
+);
+const SubEmployerSchema = new Schema<ISubEmployerUser>({
+  defaultEmployerID: { type: Schema.Types.ObjectId, ref: "generalUser" },
+  defaultEmployerEmail: { type: String },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+});
+const SubEmployerUser = mongoose.model<ISubEmployerUser>(
+  "subEmployerUser",
+  SubEmployerSchema
+);
+export { generalUser, SubEmployerUser };
