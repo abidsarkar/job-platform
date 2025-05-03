@@ -5,6 +5,7 @@ import {
   AccountStatus,
   ISubEmployerUser,
 } from "./generalUser.interface"; // Import IUser Interface
+import { boolean } from "zod";
 // User Schema for Job Seeker
 const generalUserSchema = new Schema<IGeneralUser>({
   name: { type: String, required: true },
@@ -30,8 +31,10 @@ const generalUser = mongoose.model<IGeneralUser>(
 const SubEmployerSchema = new Schema<ISubEmployerUser>({
   defaultEmployerID: { type: Schema.Types.ObjectId, ref: "generalUser" },
   defaultEmployerEmail: { type: String },
+  name:{type:String,required:true},
   email: { type: String, required: true },
   password: { type: String, required: true },
+  isDefaultAccount:{type:Boolean,default:false}
 });
 const SubEmployerUser = mongoose.model<ISubEmployerUser>(
   "subEmployerUser",

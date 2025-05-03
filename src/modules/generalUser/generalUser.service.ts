@@ -91,6 +91,7 @@ export const registerGeneralUserService = async (
 
   // Set account status based on role
   const isActiveAccount = validRole === Role.employer ? "pending" : "active";
+  const isDefaultAccount = validRole === Role.employer ? true : false;
 
   // Create a new user document
   const newUser = new generalUser({
@@ -101,6 +102,7 @@ export const registerGeneralUserService = async (
     otpExpiresAt,
     role: validRole,
     isActiveAccount,
+    isDefaultAccount,
   });
   // Send OTP to the user's email
   await sendOTPEmailRegister(name, email, otp);
