@@ -1,17 +1,5 @@
 import { Request, Response } from "express";
-import {
-  updatePersonalInformationJobSeekersService,
-  profilePictureUploadService,
-  resumeUploadService,
-  getPersonalInformationServices,
-  updateProfileInformationJobSeekersService,
-  getProfileInformationServices,
-  updateSocialMediaJobSeekersService,
-  getSocialMediaServices,
-  updateAccountJobSeekersService,
-  getAccountJobSeekersService,
-  getAllInformationJobSeekersService
-} from "./jobSeekerUser.service";
+
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";

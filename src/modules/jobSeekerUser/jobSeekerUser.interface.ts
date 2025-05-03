@@ -51,6 +51,8 @@ export interface IJobSeekerAccountSettings extends Document {
   _id: mongoose.Types.ObjectId;
   fullAddress?: string | null;
   city?: string | null;
+  state?: string | null;
+  country?: string | null;
   phoneNumber?: string | null;
   jobAlertRole?: string | null;
   jobAlertCity?: string | null;
