@@ -32,6 +32,7 @@ const SubEmployerSchema = new Schema<ISubEmployerUser>({
   defaultEmployerID: { type: Schema.Types.ObjectId, ref: "generalUser" },
   defaultEmployerEmail: { type: String },
   name:{type:String,required:true},
+  role:{type:String,enum:["subEmployer"]},
   email: { type: String, required: true },
   password: { type: String, required: true },
   isDefaultAccount:{type:Boolean,default:false}

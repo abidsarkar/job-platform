@@ -45,9 +45,10 @@ export interface ISubEmployerUser extends Document{
   _id:mongoose.Types.ObjectId;
   defaultEmployerID:mongoose.Types.ObjectId;
   defaultEmployerEmail:string; 
+  role:string
   name:string; 
   email:string;
-  password:string;
+  password:string | null;
   isDefaultAccount?:boolean;
   
 }

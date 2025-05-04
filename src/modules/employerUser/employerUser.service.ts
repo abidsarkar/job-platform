@@ -73,7 +73,7 @@ export const registerSubEmployerUserService = async (
 
   // Hash the password before saving
   const hashedPassword = await hashPassword(password);
-  console.log(name, email);
+  
   await sendSubEmployerRegistrationEmail(name, email, "localhost:5000");
   // Create a new user document
   const newSubUser = new SubEmployerUser({
@@ -81,6 +81,7 @@ export const registerSubEmployerUserService = async (
     defaultEmployerEmail,
     name,
     email,
+    role:"subEmployer",
     password: hashedPassword, // Hashed password
     isDefaultAccount: false,
   });

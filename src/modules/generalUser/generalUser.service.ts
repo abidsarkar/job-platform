@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Role } from "./generalUser.interface";
-import { generalUser } from "./generalUser.model"; // Import updated model
+import { generalUser, SubEmployerUser } from "./generalUser.model"; // Import updated model
 import {
   generateOTP,
   hashPassword,
@@ -188,9 +188,64 @@ export const loginGeneralUserService = async (
     throw new ApiError(httpStatus.BAD_REQUEST, "Email and password required.");
   }
   // 2. Check if user exists
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    // Check if sub-employer exists
+    user = await SubEmployerUser.findOne({ email });
+    if (user) {
+      // if sub-employer exists,check if the default employer is verified
+      const defaultEmployer = await generalUser.findById({
+        _id: user.defaultEmployerID,
+      });
+      if (!defaultEmployer) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Default employer not found.");
+      }
+      //check if the default employer is verified
+      if (!defaultEmployer.isVerified) {
+        throw new ApiError(
+          httpStatus.UNAUTHORIZED,
+          "Default employer is not verified"
+        );
+      }
+      //main default employer account is deactivate by admin
+      if (defaultEmployer.isActiveAccount !== "active") {
+        throw new ApiError(
+          httpStatus.UNAUTHORIZED,
+          `Your Main Admin account is deactivate by admin Mail to ${Nodemailer_GMAIL}for more details`
+        );
+      }
+      //check default employer subscription plan later
+      //password validation
+      if (!user.password) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "password is not valid");
+      }
+      const isPasswordValid = await verifyPassword(
+        password,
+        user.password
+      );
+      if (!isPasswordValid) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Password is not valid");
+      }
+      const token = generateToken({
+        id: user._id, // Correct property name
+        role: user.role, // Correct the role name spelling
+        email: user.email,
+      });
+      console.log(user);
+      return {
+        token,
+        role:user.role,
+        subEmployer:{
+          name:user.name,
+          email:user.email,
+          id:user._id,
+          defaultEmployerID:user.defaultEmployerID,
+          defaultEmployerEmail:defaultEmployer.email
+        },
+      };
+    } else {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
   }
   // 3. Check if password is available in the user object
   if (!user.password) {

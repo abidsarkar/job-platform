@@ -6,7 +6,7 @@ import {
   resendOTPGeneralUserService,
   forgotPasswordOTPGeneralUserService,
   changePasswordForgetPassGeneralUserService,
-  changePasswordGeneralUserService
+  changePasswordGeneralUserService,
 } from "./generalUser.service";
 import { sendCookie } from "./generalUser.utils";
 import sendResponse from "../../utils/sendResponse";
@@ -52,7 +52,7 @@ export const emailVerificationGeneralUser = catchAsync(
       success: true, // Indicates success
       message: message, // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         user, // Send the user data (excluding password)
       },
     });
@@ -64,7 +64,7 @@ export const logionGeneralUser = catchAsync(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const { token, user, message, role, ACCEPTED_BY_ADMIN } =
+    const { token, user, message, role, ACCEPTED_BY_ADMIN, subEmployer } =
       await loginGeneralUserService(email, password);
     sendCookie(res, token);
 
@@ -78,6 +78,7 @@ export const logionGeneralUser = catchAsync(
         ACCEPTED_BY_ADMIN,
         accessToken: token, // Send the JWT token
         userData: user, // Send the user data (excluding password)
+        subEmployer: subEmployer,
       },
     });
   }
@@ -93,7 +94,7 @@ export const resendOTPGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
         // Send the user data (excluding password)
       },
     });
@@ -110,7 +111,7 @@ export const forgotPasswordOTPGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "otp is send again", // Message to be sent in the response
       data: {
-        accessToken:token, // Send the JWT token
+        accessToken: token, // Send the JWT token
       },
     });
   }
@@ -129,7 +130,7 @@ export const ChangePasswordForgetPassGeneralUser = catchAsync(
       success: true, // Indicates success
       message: "Password Change Successful", // Message to be sent in the response
       data: {
-        accessToken:token,
+        accessToken: token,
       },
     });
   }
@@ -156,15 +157,11 @@ export const ChangePasswordGeneralUser = catchAsync(
     });
   }
 );
-export const logout = catchAsync(
-  async(req:Request,res:Response)=>{
-  
-    res.cookie("accessToken", "", {
-      httpOnly: true, // Makes the cookie accessible only to HTTP requests
-      secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
-      maxAge: 1, // Expire the cookie immediately
-      sameSite: "none", // Ensure cookie is sent in cross-origin requests
-    });
-
-  }
-)
+export const logout = catchAsync(async (req: Request, res: Response) => {
+  res.cookie("accessToken", "", {
+    httpOnly: true, // Makes the cookie accessible only to HTTP requests
+    secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS in production
+    maxAge: 1, // Expire the cookie immediately
+    sameSite: "none", // Ensure cookie is sent in cross-origin requests
+  });
+});
