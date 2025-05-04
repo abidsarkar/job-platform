@@ -1,26 +1,25 @@
 import nodemailer from 'nodemailer';
 
+import {
+  Nodemailer_GMAIL,
+  Nodemailer_GMAIL_PASSWORD,
+  OTP_EXPIRE_TIME,
+} from "../../config";
 export const sendSubEmployerRegistrationEmail = async (
   subEmployerName: string,
   subEmployerEmail: string,
   confirmationLink: string
-) => {
+) : Promise<void> =>{
   // Create a transporter using your SMTP service (e.g., Gmail)
   const transporter = nodemailer.createTransport({
-    service: 'gmail', // Replace with your email service
+    service: 'gmail', // Replace with your email service,
+    secure: true,
     auth: {
-      user: 'your-email@gmail.com', // Your email
-      pass: 'your-email-password', // Your email password or app-specific password
+      user: process.env.Nodemailer_GMAIL, // Ensure this is defined in your .env
+      pass: process.env.Nodemailer_GMAIL_PASSWORD, // Ensure this is defined in your .env
     },
   });
-
-  // Define email options
-  const mailOptions = {
-    from: 'your-email@gmail.com', // Sender address
-    to: subEmployerEmail, // Receiver's email
-    subject: 'Welcome to [Your Company Name] - Sub-Employer Registration Confirmation',
-    html: `
-      <!DOCTYPE html>
+const emailContent = ` <!DOCTYPE html>
       <html lang="en">
         <head>
           <meta charset="UTF-8">
@@ -79,8 +78,13 @@ export const sendSubEmployerRegistrationEmail = async (
             </div>
           </div>
         </body>
-      </html>
-    `,
+      </html>`;
+  // Define email options
+  const mailOptions = {
+    from: 'your-email@gmail.com', // Sender address
+    to: subEmployerEmail, // Receiver's email
+    subject: 'Welcome to our Company - Sub-Employer Registration Confirmation',
+    html:  emailContent,
   };
 
   // Send the email

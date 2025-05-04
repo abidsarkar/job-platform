@@ -9,6 +9,7 @@ import  {jobSeekerUserRoutes} from "../modules/jobSeekerUser/jobSeekerUser.route
 import { categoryRoutes} from "../modules/allCategory/allCategory.route"
 import {generalUserRoutes} from "../modules/generalUser/generalUser.route"
 import {employerUserRoutes} from "../modules/employerUser/employerUser.route"
+import { getTestPage } from "../modules/test/test.controller";
 import {
   AppInstruction,
   htmlRoute,
@@ -20,6 +21,9 @@ import { AdminRoutes } from "../modules/admin/admin.route";
 import { ArticalsRoute } from "../modules/articals/articals.route";
 
 export const routesConfig = [
+  //testing route
+  { path: "/api/v1/test", handler: getTestPage },
+  //other routes
   { path: "/api/v1/auth", handler: generalUserRoutes },
   { path: "/api/v1/jobSeekerUser", handler: jobSeekerUserRoutes },
   { path: "/api/v1/employer", handler: employerUserRoutes },
