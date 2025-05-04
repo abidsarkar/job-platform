@@ -33,6 +33,9 @@ const SubEmployerSchema = new Schema<ISubEmployerUser>({
   defaultEmployerEmail: { type: String },
   name:{type:String,required:true},
   role:{type:String,enum:["subEmployer"]},
+  otp:{type:String},
+  otpExpiresAt:{type:Date},
+  isForgotPasswordVerified:{type:Boolean,default:false},
   email: { type: String, required: true },
   password: { type: String, required: true },
   isDefaultAccount:{type:Boolean,default:false}

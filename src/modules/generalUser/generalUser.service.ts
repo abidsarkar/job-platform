@@ -125,9 +125,12 @@ export const otpVerificationGeneralUserService = async (
   otp: string
 ) => {
   // 1. Check if the user exists in the database
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    user = await SubEmployerUser.findOne({ email });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
   }
 
   // 2. Find the OTP record for the provided email
@@ -219,10 +222,7 @@ export const loginGeneralUserService = async (
       if (!user.password) {
         throw new ApiError(httpStatus.BAD_REQUEST, "password is not valid");
       }
-      const isPasswordValid = await verifyPassword(
-        password,
-        user.password
-      );
+      const isPasswordValid = await verifyPassword(password, user.password);
       if (!isPasswordValid) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Password is not valid");
       }
@@ -231,16 +231,16 @@ export const loginGeneralUserService = async (
         role: user.role, // Correct the role name spelling
         email: user.email,
       });
-      console.log(user);
+      //console.log(user);
       return {
         token,
-        role:user.role,
-        subEmployer:{
-          name:user.name,
-          email:user.email,
-          id:user._id,
-          defaultEmployerID:user.defaultEmployerID,
-          defaultEmployerEmail:defaultEmployer.email
+        role: user.role,
+        subEmployer: {
+          name: user.name,
+          email: user.email,
+          id: user._id,
+          defaultEmployerID: user.defaultEmployerID,
+          defaultEmployerEmail: defaultEmployer.email,
         },
       };
     } else {
@@ -308,9 +308,12 @@ export const loginGeneralUserService = async (
 //resend otp
 export const resendOTPGeneralUserService = async (email: string) => {
   // 1. Check if the user exists
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    user = await SubEmployerUser.findOne({ email });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
   }
 
   // 2. Generate OTP
@@ -343,9 +346,14 @@ export const resendOTPGeneralUserService = async (email: string) => {
 //forgot password service
 export const forgotPasswordOTPGeneralUserService = async (email: string) => {
   // 1. Check if the user exists
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    user = await SubEmployerUser.findOne({ email });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
+    // console.log(user);
+    //
   }
 
   // 2. Generate OTP
@@ -381,9 +389,12 @@ export const changePasswordForgetPassGeneralUserService = async (
   confirmPassword: string
 ) => {
   // 1. Check if the user exists
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    user = await SubEmployerUser.findOne({ email });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
   }
   if (!user.isForgotPasswordVerified) {
     throw new ApiError(
@@ -437,9 +448,12 @@ export const changePasswordGeneralUserService = async (
   confirmNewPassword: string
 ) => {
   // 1. Check if the user exists
-  const user = await generalUser.findOne({ email });
+  let user = await generalUser.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    user = await SubEmployerUser.findOne({ email });
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found.");
+    }
   }
   const storedPassword = user.password;
   if (!storedPassword) {

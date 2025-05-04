@@ -87,9 +87,10 @@ export const registerSubEmployerUserService = async (
   });
 
   await newSubUser.save(); // Save user with OTP
+  const newSubUser2 = await SubEmployerUser.findOne({ email }).select("-password");
 
   // Return OTP and token for registration process
-  return { newSubUser };
+  return { newSubUser2 };
 };
 //delete sub employer by default employer
 export const deleteSubEmployerUserService = async (

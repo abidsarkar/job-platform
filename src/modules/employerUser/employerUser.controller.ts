@@ -21,7 +21,7 @@ export const registerSubEmployerUser = catchAsync(
     //ok
     //console.log(defaultEmployerID, defaultEmployerEmail);
     // Call the service to register the user and send OTP
-    const { newSubUser } = await registerSubEmployerUserService(
+    const { newSubUser2 } = await registerSubEmployerUserService(
       defaultEmployerID,
       defaultEmployerEmail,
       name,
@@ -35,7 +35,7 @@ export const registerSubEmployerUser = catchAsync(
       success: true,
       message:
         "Sub Employer User Registration successful. Please Login To continue",
-      data: { newSubUser },
+      data: { newSubUser2 },
     });
   }
 );

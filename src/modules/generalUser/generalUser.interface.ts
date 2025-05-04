@@ -3,7 +3,6 @@ import { TRole } from "../../config/role"; // Assuming TRole is imported from so
 
 // Enum for Gender, Marital Status, and Job Alert Role for better type safety
 
-
 export enum JobAlertRole {
   Developer = "Developer",
   Designer = "Designer",
@@ -35,21 +34,22 @@ export interface IGeneralUser extends Document {
   isVerified?: boolean;
   isActiveAccount?: AccountStatus;
   isForgotPasswordVerified?: boolean;
-  isDefaultAccount?:boolean;
+  isDefaultAccount?: boolean;
   defaultEmployerID?: mongoose.Types.ObjectId; // Reference to the default employer
   jobDetailsID?: mongoose.Types.ObjectId; // Reference to JobSeekersJob model
   personalInfoID?: mongoose.Types.ObjectId; // Reference to JobSeekersPersonalInfo model
   socialMediaID?: mongoose.Types.ObjectId; // Reference to JobSeekersSocialMedia model
 }
-export interface ISubEmployerUser extends Document{
-  _id:mongoose.Types.ObjectId;
-  defaultEmployerID:mongoose.Types.ObjectId;
-  defaultEmployerEmail:string; 
-  role:string
-  name:string; 
-  email:string;
-  password:string | null;
-  isDefaultAccount?:boolean;
-  
+export interface ISubEmployerUser extends Document {
+  _id: mongoose.Types.ObjectId;
+  defaultEmployerID?: mongoose.Types.ObjectId;
+  defaultEmployerEmail?: string;
+  role?: string;
+  otp?: string | null;
+  otpExpiresAt?: Date | null;
+  isForgotPasswordVerified?: boolean;
+  name?: string;
+  email?: string;
+  password?: string | null;
+  isDefaultAccount?: boolean;
 }
-
