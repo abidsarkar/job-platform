@@ -29,6 +29,12 @@ import {
   JobSeekersAccountSetting,
   JobSeekersSocialMedia,
 } from "../jobSeekerUser/jobSeekerUser.model";
+import {
+  EmployerCompanyInfo,
+  EmployerFoundingInfo,
+  EmployerSocialMedia,
+  EmployerContact,
+} from "../employerUser/employerUser.model";
 // Register user service (handles OTP and registration)
 export const registerGeneralUserService = async (
   name: string,
@@ -113,6 +119,14 @@ export const registerGeneralUserService = async (
       JobSeekersProfile.create({ userId: newUser._id, email }),
       JobSeekersAccountSetting.create({ userId: newUser._id, email }),
       JobSeekersSocialMedia.create({ userId: newUser._id, email }),
+    ]);
+  }
+  if (validRole === Role.employer) {
+    await Promise.all([
+      EmployerCompanyInfo.create({ userId: newUser._id, email }),
+      EmployerFoundingInfo.create({ userId: newUser._id, email }),
+      EmployerSocialMedia.create({ userId: newUser._id, email }),
+      EmployerContact.create({ userId: newUser._id, email }),
     ]);
   }
   // Return OTP and token for registration process

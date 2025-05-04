@@ -10,7 +10,7 @@ import {
   getSocialMediaServices,
   updateAccountJobSeekersService,
   getAccountJobSeekersService,
-  getAllInformationJobSeekersService
+  getAllInformationJobSeekersService,
 } from "./jobSeekerUser.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
@@ -227,16 +227,12 @@ export const updateSocialMediaInformationJobSeekersUser = catchAsync(
     });
   }
 );
-//get social media 
+//get social media
 export const getSocialMediaInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { id, role, email }: any = req.user;
 
-    const { token, data } = await getSocialMediaServices(
-      id,
-      email,
-      role
-    );
+    const { token, data } = await getSocialMediaServices(id, email, role);
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
@@ -250,24 +246,29 @@ export const getSocialMediaInformationJobSeekersUser = catchAsync(
     });
   }
 );
-//update account 
+//update account
 export const updateAccountInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     // Extract user data from req.user (set by the verifyTokenMiddleware)
     const { id, role, email }: any = req.user;
-    const { fullAddress, phoneNumber,jobAlertRole ,jobAlertCity} = req.body; // Data from request body
+    const { fullAddress, phoneNumber, jobAlertRole, jobAlertCity } = req.body; // Data from request body
     if (!fullAddress) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Full address is required.");
     }
-  
+
     // Split the full address into city, state, and country using comma as delimiter
-    const addressParts = fullAddress.split(',');
-  
+    const addressParts = fullAddress.split(",");
+
     if (addressParts.length !== 3) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid address format. Please provide city, state, and country.");
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Invalid address format. Please provide city, state, and country."
+      );
     }
-  
-    const [city, state, country] = addressParts.map((part: string) => part.trim()); // Trim spaces around the parts
+
+    const [city, state, country] = addressParts.map((part: string) =>
+      part.trim()
+    ); // Trim spaces around the parts
     // Update other profile information (without overwriting existing data if not provided)
     const updatedData = {
       fullAddress: fullAddress || undefined, // Only update if provided
@@ -304,11 +305,7 @@ export const getAccountInformationJobSeekersUser = catchAsync(
   async (req: Request, res: Response) => {
     const { id, role, email }: any = req.user;
 
-    const { token, data } = await getAccountJobSeekersService(
-      id,
-      email,
-      role
-    );
+    const { token, data } = await getAccountJobSeekersService(id, email, role);
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {

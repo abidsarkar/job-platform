@@ -16,10 +16,8 @@ export interface IEmployerCompanyInfo extends Document {
     fileServerName: string;
     pathA: string;
   };
-  CompanyName?: string | null;
-  education?: string | null;
-  AboutUs?: string | null;
-  isAccountComplete?:boolean;
+  companyName?: string | null;
+  aboutUs?: string | null;
   userId?: mongoose.Types.ObjectId; // Reference to JobSeekerUser model
   email: string;
 }
