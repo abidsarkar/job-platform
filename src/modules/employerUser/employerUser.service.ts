@@ -56,6 +56,18 @@ export const registerSubEmployerUserService = async (
       "the Default employer id is not valid"
     );
   }
+   // Check how many sub-employers are already associated with the default employer
+   const subEmployerCount = await SubEmployerUser.countDocuments({
+    defaultEmployerID: defaultEmployerID,
+  });
+
+  // If there are already two sub-employers, throw an error
+  if (subEmployerCount >= 2) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "You can only have a maximum of two sub-employers."
+    );
+  }
   //password validation
   if (password.length < 6) {
     throw new ApiError(
