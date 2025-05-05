@@ -25,7 +25,7 @@ const profilePictureStorage = multer.diskStorage({
 //logo
 const logoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, createUploadFolder('logo'));
+    cb(null, createUploadFolder('logos'));
   },
   filename: (req, file, cb) => {
     const filename = `${Date.now()}-${file.originalname}`;
@@ -57,7 +57,7 @@ const cvStorage = multer.diskStorage({
 
 // **Profile Picture File Filter and Size Limit**
 const profilePictureFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png/; // Only JPG, JPEG, PNG allowed
+  const allowedTypes = /jpeg|jpg|png|webp|avif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimeType = allowedTypes.test(file.mimetype);
 
@@ -75,7 +75,7 @@ const profilePictureUpload = multer({
 }).single('profilePicture');
 // **logo image File Filter and Size Limit**
 const logoFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png/; // Only JPG, JPEG, PNG allowed
+  const allowedTypes = /jpeg|jpg|png|webp|avif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimeType = allowedTypes.test(file.mimetype);
 
@@ -94,7 +94,7 @@ const logoUpload = multer({
 
 // **Banner File Filter and Size Limit**
 const bannerFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png/; // Only JPG, JPEG, PNG allowed
+  const allowedTypes = /jpeg|jpg|png|webp|avif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimeType = allowedTypes.test(file.mimetype);
 

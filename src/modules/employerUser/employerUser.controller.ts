@@ -8,11 +8,12 @@ import {
   registerSubEmployerUserService,
   deleteSubEmployerUserService,
   updateCompanyInfoService,
-  companyLogoAndBannerUploadService
+  companyLogoUploadService,
+  companyBannerUploadService,
 } from "./employerUser.service";
 import { sendCookie } from "../generalUser/generalUser.utils";
 import mongoose from "mongoose";
-const path = require("path");
+import path from "path";
 // sub employer user registration
 export const registerSubEmployerUser = catchAsync(
   async (req: Request, res: Response) => {
@@ -65,7 +66,7 @@ export const deleteSubEmployerUser = catchAsync(
     });
   }
 );
-//update company information
+//update company information both logo and banner
 export const updateCompanyInfo = catchAsync(
   async (req: Request, res: Response) => {
     const { companyName, aboutUs } = req.body;
@@ -77,25 +78,39 @@ export const updateCompanyInfo = catchAsync(
       companyName,
       aboutUs
     );
-      // Handle the profile picture
-        let fileOriginalName = null;
-        let fileServerName = null;
-        let filePathURL = null;
-        let pathA = null;
-        if (req.file) {
-          // If profile picture is uploaded, store its path in the variable
-          fileOriginalName = req.file.originalname;
-          fileServerName = req.file.filename;
-          filePathURL = `/uploads/profile_pictures/${fileServerName}`;
-          pathA = req.file.path;
-          await companyLogoAndBannerUploadService(
-            email,
-            fileOriginalName,
-            fileServerName,
-            filePathURL,
-            pathA
-          );
-        }
+    // Handle the profile picture
+    let fileOriginalName = null;
+    let fileServerName = null;
+    let filePathURL = null;
+    let pathA = null;
+    if (req.file) {
+      // If logo is uploaded, store its path in the variable
+      fileOriginalName = req.file.originalname;
+      fileServerName = req.file.filename;
+      filePathURL = `/uploads/logos/${fileServerName}`;
+      pathA = req.file.path;
+      await companyLogoUploadService(
+        email,
+        fileOriginalName,
+        fileServerName,
+        filePathURL,
+        pathA
+      );
+    }
+    // if (req.file) {
+    //   // If logo is uploaded, store its path in the variable
+    //   fileOriginalName = req.file.originalname;
+    //   fileServerName = req.file.filename;
+    //   filePathURL = `/uploads/banners/${fileServerName}`;
+    //   pathA = req.file.path;
+    //   await companyBannerUploadService(
+    //     email,
+    //     fileOriginalName,
+    //     fileServerName,
+    //     filePathURL,
+    //     pathA
+    //   );
+    // }
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
@@ -109,3 +124,4 @@ export const updateCompanyInfo = catchAsync(
     });
   }
 );
+

@@ -249,3 +249,68 @@ export const companyLogoAndBannerUploadService = async (
 
   return companyProfile; // Return the updated company profile
 }
+// Upload company logo
+export const companyLogoUploadService = async (
+  email: string,
+  fileOriginalName: string,
+  fileServerName: string,
+  filePathURL: string,
+  pathA: string
+) => {
+  const companyLogo = await EmployerCompanyInfo.findOne({ email });
+  if (!companyLogo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Employer account not found.");
+  }
+
+  // Delete the previous logo if it exists
+  if (companyLogo.logo?.fileServerName && companyLogo.logo.fileServerName !== fileServerName) {
+    const oldFilePath = companyLogo.logo.pathA;
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath);  // Delete the old file
+    }
+  }
+
+  // Update or set the logo data
+  companyLogo.logo = {
+    filePathURL,
+    fileOriginalName,
+    fileServerName,
+    pathA,
+  };
+
+  await companyLogo.save();  // Save the updated data
+  return companyLogo;
+};
+
+// Upload company banner
+export const companyBannerUploadService = async (
+  email: string,
+  fileOriginalName: string,
+  fileServerName: string,
+  filePathURL: string,
+  pathA: string
+) => {
+  const companyBanner = await EmployerCompanyInfo.findOne({ email });
+  if (!companyBanner) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Employer account not found.");
+  }
+
+  // Delete the previous banner if it exists
+  if (companyBanner.banner?.fileServerName && companyBanner.banner.fileServerName !== fileServerName) {
+    const oldFilePath = companyBanner.banner.pathA;
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath);  // Delete the old file
+    }
+  }
+
+  // Update or set the banner data
+  companyBanner.banner = {
+    filePathURL,
+    fileOriginalName,
+    fileServerName,
+    pathA,
+  };
+
+  await companyBanner.save();  // Save the updated data
+  return companyBanner;
+};
