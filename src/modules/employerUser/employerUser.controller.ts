@@ -83,6 +83,7 @@ export const updateCompanyInfo = catchAsync(
     let fileServerName = null;
     let filePathURL = null;
     let pathA = null;
+    
     if (req.file) {
       // If logo is uploaded, store its path in the variable
       fileOriginalName = req.file.originalname;
