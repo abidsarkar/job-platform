@@ -22,6 +22,16 @@ const profilePictureStorage = multer.diskStorage({
     cb(null, filename);
   },
 });
+//logo
+const logoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, createUploadFolder('logo'));
+  },
+  filename: (req, file, cb) => {
+    const filename = `${Date.now()}-${file.originalname}`;
+    cb(null, filename);
+  },
+});
 
 // Banner Multer
 const bannerStorage = multer.diskStorage({
@@ -63,6 +73,24 @@ const profilePictureUpload = multer({
   fileFilter: profilePictureFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB size limit for profile picture
 }).single('profilePicture');
+// **logo image File Filter and Size Limit**
+const logoFilter = (req: any, file: any, cb: any) => {
+  const allowedTypes = /jpeg|jpg|png/; // Only JPG, JPEG, PNG allowed
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimeType = allowedTypes.test(file.mimetype);
+
+  if (mimeType && extname) {
+    return cb(null, true); // Allow the file if it matches the filter
+  } else {
+    return cb(new ApiError(400, 'Invalid file type for logo picture. Allowed types: JPG, PNG.'));
+  }
+};
+
+const logoUpload = multer({
+  storage: logoStorage,
+  fileFilter: logoFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB size limit for profile picture
+}).single('logo');
 
 // **Banner File Filter and Size Limit**
 const bannerFilter = (req: any, file: any, cb: any) => {
@@ -103,4 +131,4 @@ const cvUpload = multer({
 }).single('cv');
 
 // Export all the separate multer instances
-export { profilePictureUpload, bannerUpload, cvUpload };
+export { profilePictureUpload,logoUpload, bannerUpload, cvUpload };
