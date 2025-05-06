@@ -149,53 +149,53 @@ export const updateCompanyInfoService = async (
   // console.log(id,email,role,companyName,aboutUs);
   //check if the user is is valid
   const user = await generalUser.findOne({ _id: id });
-  
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "The user is not found");
   }
-    // Find the company information by userId
-    let companyInfo = await EmployerCompanyInfo.findOne({
-      userId: id,
-    });
-  
-    if (companyInfo) {
-      // Update only the fields that are different
-      const updates: any = {};
-      
-      if (companyInfo.companyName !== companyName) {
-        updates.companyName = companyName;
-      }
-      if (companyInfo.aboutUs !== aboutUs) {
-        updates.aboutUs = aboutUs;
-      }
-  
-      // Use findOneAndUpdate to update fields without overwriting the document
-      companyInfo = await EmployerCompanyInfo.findOneAndUpdate(
-        { userId: id },
-        { $set: updates }, // Updates only the changed fields
-        { new: true } // To return the updated document
-      );
-  
-      // console.log("Company information updated:", companyInfo);
-    } else {
-      // If the document doesn't exist, create a new one
-      companyInfo = new EmployerCompanyInfo({
-        userId: id,
-        email: email,
-        companyName,
-        aboutUs,
-      });
-  
-      await companyInfo.save(); // Save the new document
-      // console.log("New company information created:", companyInfo);
+  // Find the company information by userId
+  let companyInfo = await EmployerCompanyInfo.findOne({
+    userId: id,
+  });
+
+  if (companyInfo) {
+    // Update only the fields that are different
+    const updates: any = {};
+
+    if (companyInfo.companyName !== companyName) {
+      updates.companyName = companyName;
     }
+    if (companyInfo.aboutUs !== aboutUs) {
+      updates.aboutUs = aboutUs;
+    }
+
+    // Use findOneAndUpdate to update fields without overwriting the document
+    companyInfo = await EmployerCompanyInfo.findOneAndUpdate(
+      { userId: id },
+      { $set: updates }, // Updates only the changed fields
+      { new: true } // To return the updated document
+    );
+
+    // console.log("Company information updated:", companyInfo);
+  } else {
+    // If the document doesn't exist, create a new one
+    companyInfo = new EmployerCompanyInfo({
+      userId: id,
+      email: email,
+      companyName,
+      aboutUs,
+    });
+
+    await companyInfo.save(); // Save the new document
+    // console.log("New company information created:", companyInfo);
+  }
   const token = generateToken({
     id: id,
     role: role,
     email: email,
   });
- 
-  return { token, data: {companyInfo} };
+
+  return { token, data: { companyInfo } };
 };
 // Company Logo and Banner Upload Service
 export const companyLogoAndBannerUploadService = async (
@@ -248,14 +248,14 @@ export const companyLogoAndBannerUploadService = async (
   await companyProfile.save();
 
   return companyProfile; // Return the updated company profile
-}
+};
 // Upload company logo
 export const companyLogoUploadService = async (
   email: string,
-  fileOriginalName: string,
-  fileServerName: string,
-  filePathURL: string,
-  pathA: string
+  fileOriginalName: string | undefined,
+  fileServerName: string | undefined,
+  filePathURL: string | undefined,
+  pathA: string | undefined
 ) => {
   const companyLogo = await EmployerCompanyInfo.findOne({ email });
   if (!companyLogo) {
@@ -263,13 +263,21 @@ export const companyLogoUploadService = async (
   }
 
   // Delete the previous logo if it exists
-  if (companyLogo.logo?.fileServerName && companyLogo.logo.fileServerName !== fileServerName) {
+  if (
+    companyLogo.logo?.fileServerName &&
+    companyLogo.logo.fileServerName !== fileServerName
+  ) {
     const oldFilePath = companyLogo.logo.pathA;
     if (fs.existsSync(oldFilePath)) {
-      fs.unlinkSync(oldFilePath);  // Delete the old file
+      fs.unlinkSync(oldFilePath); // Delete the old file
     }
   }
-
+  if (!fileOriginalName || !fileServerName || !filePathURL || !pathA) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "please provide all the file data"
+    );
+  }
   // Update or set the logo data
   companyLogo.logo = {
     filePathURL,
@@ -278,17 +286,17 @@ export const companyLogoUploadService = async (
     pathA,
   };
 
-  await companyLogo.save();  // Save the updated data
+  await companyLogo.save(); // Save the updated data
   return companyLogo;
 };
 
 // Upload company banner
 export const companyBannerUploadService = async (
-  email: string,
-  fileOriginalName: string,
-  fileServerName: string,
-  filePathURL: string,
-  pathA: string
+  email: string | undefined,
+  fileOriginalName: string | undefined,
+  fileServerName: string | undefined,
+  filePathURL: string | undefined,
+  pathA: string | undefined
 ) => {
   const companyBanner = await EmployerCompanyInfo.findOne({ email });
   if (!companyBanner) {
@@ -296,13 +304,21 @@ export const companyBannerUploadService = async (
   }
 
   // Delete the previous banner if it exists
-  if (companyBanner.banner?.fileServerName && companyBanner.banner.fileServerName !== fileServerName) {
+  if (
+    companyBanner.banner?.fileServerName &&
+    companyBanner.banner.fileServerName !== fileServerName
+  ) {
     const oldFilePath = companyBanner.banner.pathA;
     if (fs.existsSync(oldFilePath)) {
-      fs.unlinkSync(oldFilePath);  // Delete the old file
+      fs.unlinkSync(oldFilePath); // Delete the old file
     }
   }
-
+  if (!fileOriginalName || !fileServerName || !filePathURL || !pathA) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "please provide all the file data"
+    );
+  }
   // Update or set the banner data
   companyBanner.banner = {
     filePathURL,
@@ -311,6 +327,6 @@ export const companyBannerUploadService = async (
     pathA,
   };
 
-  await companyBanner.save();  // Save the updated data
+  await companyBanner.save(); // Save the updated data
   return companyBanner;
 };

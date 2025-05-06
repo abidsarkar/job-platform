@@ -92,40 +92,48 @@ export const updateCompanyInfo = catchAsync(
       companyName,
       aboutUs
     );
+
+    const files = req.files as MulterFiles | undefined;
+
     // Initialize variables for file data
-    // let logoData = null;
-    // let bannerData = null;
-    // let logoFile = null;
-    // let bannerFile = null;
-// Type assertion for req.files
-const files = req.files as MulterFiles | undefined;
+    let logoData: FileData | null = null;
+    let bannerData: FileData | null = null;
 
-// Initialize variables for file data
-let logoData: FileData | null = null;
-let bannerData: FileData | null = null;
+    // Handle logo upload if exists
+    if (files?.logo?.[0]) {
+      const logoFile = files.logo[0];
 
-// Handle logo upload if exists
-if (files?.logo?.[0]) {
-  const logoFile = files.logo[0];
-  logoData = {
-    fileOriginalName: logoFile.originalname,
-    fileServerName: logoFile.filename,
-    filePathURL: `/uploads/logos/${logoFile.filename}`,
-    pathA: logoFile.path
-  };
-}
-
-// Handle banner upload if exists - FIXED THE TYPO FROM YOUR CODE
-if (files?.banner?.[0]) {
-  const bannerFile = files.banner[0]; // Fixed: was using 'logo' instead of 'banner'
-  bannerData = {
-    fileOriginalName: bannerFile.originalname,
-    fileServerName: bannerFile.filename,
-    filePathURL: `/uploads/banners/${bannerFile.filename}`, // Fixed: was using '/logos' instead of '/banners'
-    pathA: bannerFile.path
-  };
-}
-
+      logoData = {
+        fileOriginalName: logoFile.originalname,
+        fileServerName: logoFile.filename,
+        filePathURL: `/uploads/logos/${logoFile.filename}`,
+        pathA: logoFile.path,
+      };
+    }
+    await companyLogoUploadService(
+      email,
+      logoData?.fileOriginalName,
+      logoData?.fileServerName,
+      logoData?.filePathURL,
+      logoData?.pathA
+    );
+    // Handle banner upload if exists - FIXED THE TYPO FROM YOUR CODE
+    if (files?.banner?.[0]) {
+      const bannerFile = files.banner[0]; // Fixed: was using 'logo' instead of 'banner'
+      bannerData = {
+        fileOriginalName: bannerFile.originalname,
+        fileServerName: bannerFile.filename,
+        filePathURL: `/uploads/banners/${bannerFile.filename}`, // Fixed: was using '/logos' instead of '/banners'
+        pathA: bannerFile.path,
+      };
+    }
+    await companyBannerUploadService(
+      email,
+      bannerData?.fileOriginalName,
+      bannerData?.fileServerName,
+      bannerData?.filePathURL,
+      bannerData?.pathA
+    );
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
