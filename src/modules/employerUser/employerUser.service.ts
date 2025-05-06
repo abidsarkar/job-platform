@@ -375,3 +375,61 @@ export const updateCompanyFoundingInfoService = async (
     data: companyFoundingInfo.toObject(),
   };
 };
+//update company social media information
+export const updateCompanySocialMediaInfoService = async (
+  id: string,
+  email: string,
+  role: string,
+  updatedData: any
+) => {
+  //check if the user is is valid
+  const user = await generalUser.findOne({ _id: id });
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "The user is not found");
+  }
+  // Find the company information by userId
+  let employerSocialMedia = await EmployerSocialMedia.findOne({
+    userId: id,
+  });
+  if (!employerSocialMedia) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Employer info is not found");
+  }
+  if (
+    updatedData.facebookLink &&
+    updatedData.facebookLink !== employerSocialMedia.facebookLink
+  ) {
+    employerSocialMedia.facebookLink = updatedData.facebookLink;
+  }
+  if (
+    updatedData.xLink &&
+    updatedData.industryType !== employerSocialMedia.xLink
+  ) {
+    employerSocialMedia.xLink = updatedData.xLink;
+  }
+  if (
+    updatedData.instagramLink &&
+    updatedData.instagramLink !== employerSocialMedia.instagramLink
+  ) {
+    employerSocialMedia.instagramLink = updatedData.instagramLink;
+  }
+  if (
+    updatedData.linkedinLink &&
+    updatedData.linkedinLink !== employerSocialMedia.linkedinLink
+  ) {
+    employerSocialMedia.linkedinLink = updatedData.linkedinLink;
+  }
+
+  //save the updated data
+  await employerSocialMedia.save();
+  const token = generateToken({
+    id: id,
+    role: role,
+    email: email,
+  });
+
+  return {
+    token,
+    data: employerSocialMedia.toObject(),
+  };
+};

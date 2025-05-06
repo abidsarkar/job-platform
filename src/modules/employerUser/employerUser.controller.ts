@@ -12,6 +12,7 @@ import {
   companyLogoUploadService,
   companyBannerUploadService,
   updateCompanyFoundingInfoService,
+  updateCompanySocialMediaInfoService
 } from "./employerUser.service";
 import { sendCookie } from "../generalUser/generalUser.utils";
 import mongoose from "mongoose";
@@ -184,6 +185,42 @@ export const updateCompanyFundInfo = catchAsync(
       statusCode: httpStatus.CREATED, // Status code for successful login
       success: true, // Indicates success
       message: "company founding information is updated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//update company social media information 
+export const updateCompanySocialMediaInfo = catchAsync(
+  async (req: Request, res: Response) => {
+    const {
+      facebookLink,
+      xLink,
+      instagramLink,
+      linkedinLink
+    } = req.body;
+    const { id, role, email }: any = req.user;
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      facebookLink: facebookLink || undefined, // Only update if provided
+      xLink: xLink || undefined,
+      instagramLink: instagramLink || undefined,
+      linkedinLink: linkedinLink || undefined,
+    };
+    const { token, data } = await updateCompanySocialMediaInfoService(
+      id,
+      email,
+      role,
+      updatedData
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED, // Status code for successful login
+      success: true, // Indicates success
+      message: "company social media information is updated", // Message to be sent in the response
       data: {
         accessToken: token, // Send the JWT token
         data,
