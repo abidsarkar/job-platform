@@ -11,6 +11,7 @@ import {
   updateCompanyInfoService,
   companyLogoUploadService,
   companyBannerUploadService,
+  updateCompanyFoundingInfoService,
 } from "./employerUser.service";
 import { sendCookie } from "../generalUser/generalUser.utils";
 import mongoose from "mongoose";
@@ -85,12 +86,15 @@ export const updateCompanyInfo = catchAsync(
   async (req: Request, res: Response) => {
     const { companyName, aboutUs } = req.body;
     const { id, role, email }: any = req.user;
+    const updatedData = {
+      companyName: companyName || undefined, // Only update if provided
+      aboutUs: aboutUs || undefined,
+    };
     const { token, data } = await updateCompanyInfoService(
       id,
       email,
       role,
-      companyName,
-      aboutUs
+      updatedData
     );
 
     const files = req.files as MulterFiles | undefined;
@@ -140,6 +144,46 @@ export const updateCompanyInfo = catchAsync(
       statusCode: httpStatus.ACCEPTED, // Status code for successful login
       success: true, // Indicates success
       message: "company information is updated", // Message to be sent in the response
+      data: {
+        accessToken: token, // Send the JWT token
+        data,
+      },
+    });
+  }
+);
+//update company founding information both logo and banner
+export const updateCompanyFundInfo = catchAsync(
+  async (req: Request, res: Response) => {
+    const {
+      organizationType,
+      industryType,
+      teamSize,
+      foundIN,
+      companyWebsite,
+      companyVision,
+    } = req.body;
+    const { id, role, email }: any = req.user;
+    // Update other profile information (without overwriting existing data if not provided)
+    const updatedData = {
+      organizationType: organizationType || undefined, // Only update if provided
+      industryType: industryType || undefined,
+      teamSize: teamSize || undefined,
+      foundIN: foundIN || undefined,
+      companyWebsite: companyWebsite || undefined,
+      companyVision: companyVision || undefined,
+    };
+    const { token, data } = await updateCompanyFoundingInfoService(
+      id,
+      email,
+      role,
+      updatedData
+    );
+    sendCookie(res, token);
+    // Send the response back to the client
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED, // Status code for successful login
+      success: true, // Indicates success
+      message: "company founding information is updated", // Message to be sent in the response
       data: {
         accessToken: token, // Send the JWT token
         data,

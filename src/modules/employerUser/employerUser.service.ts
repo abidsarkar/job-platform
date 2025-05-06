@@ -136,17 +136,8 @@ export const updateCompanyInfoService = async (
   id: string,
   email: string,
   role: string,
-  companyName: string,
-  aboutUs: string
+  updatedData: any
 ) => {
-  //check if the input is valid
-  if (!companyName || !aboutUs) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "please provide company name and about us "
-    );
-  }
-  // console.log(id,email,role,companyName,aboutUs);
   //check if the user is is valid
   const user = await generalUser.findOne({ _id: id });
 
@@ -157,45 +148,30 @@ export const updateCompanyInfoService = async (
   let companyInfo = await EmployerCompanyInfo.findOne({
     userId: id,
   });
-
-  if (companyInfo) {
-    // Update only the fields that are different
-    const updates: any = {};
-
-    if (companyInfo.companyName !== companyName) {
-      updates.companyName = companyName;
-    }
-    if (companyInfo.aboutUs !== aboutUs) {
-      updates.aboutUs = aboutUs;
-    }
-
-    // Use findOneAndUpdate to update fields without overwriting the document
-    companyInfo = await EmployerCompanyInfo.findOneAndUpdate(
-      { userId: id },
-      { $set: updates }, // Updates only the changed fields
-      { new: true } // To return the updated document
-    );
-
-    // console.log("Company information updated:", companyInfo);
-  } else {
-    // If the document doesn't exist, create a new one
-    companyInfo = new EmployerCompanyInfo({
-      userId: id,
-      email: email,
-      companyName,
-      aboutUs,
-    });
-
-    await companyInfo.save(); // Save the new document
-    // console.log("New company information created:", companyInfo);
+  if (!companyInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Employer info is not found");
   }
+  if (
+    updatedData.companyName &&
+    updatedData.companyName !== companyInfo.companyName
+  ) {
+    companyInfo.companyName = updatedData.companyName;
+  }
+  if (updatedData.aboutUs && updatedData.aboutUs !== companyInfo.aboutUs) {
+    companyInfo.aboutUs = updatedData.aboutUs;
+  }
+  //save the updated data
+  await companyInfo.save();
   const token = generateToken({
     id: id,
     role: role,
     email: email,
   });
 
-  return { token, data: { companyInfo } };
+  return {
+    token,
+    data: companyInfo.toObject(),
+  };
 };
 // Company Logo and Banner Upload Service
 export const companyLogoAndBannerUploadService = async (
@@ -329,4 +305,73 @@ export const companyBannerUploadService = async (
 
   await companyBanner.save(); // Save the updated data
   return companyBanner;
+};
+//update company founding information
+export const updateCompanyFoundingInfoService = async (
+  id: string,
+  email: string,
+  role: string,
+  updatedData: any
+) => {
+  //check if the user is is valid
+  const user = await generalUser.findOne({ _id: id });
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "The user is not found");
+  }
+  // Find the company information by userId
+  let companyFoundingInfo = await EmployerFoundingInfo.findOne({
+    userId: id,
+  });
+  if (!companyFoundingInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Employer info is not found");
+  }
+  if (
+    updatedData.organizationType &&
+    updatedData.organizationType !== companyFoundingInfo.organizationType
+  ) {
+    companyFoundingInfo.organizationType = updatedData.organizationType;
+  }
+  if (
+    updatedData.industryType &&
+    updatedData.industryType !== companyFoundingInfo.industryType
+  ) {
+    companyFoundingInfo.industryType = updatedData.industryType;
+  }
+  if (
+    updatedData.teamSize &&
+    updatedData.teamSize !== companyFoundingInfo.teamSize
+  ) {
+    companyFoundingInfo.teamSize = updatedData.teamSize;
+  }
+  if (
+    updatedData.foundIN &&
+    updatedData.foundIN !== companyFoundingInfo.foundIN
+  ) {
+    companyFoundingInfo.foundIN = updatedData.foundIN;
+  }
+  if (
+    updatedData.companyWebsite &&
+    updatedData.companyWebsite !== companyFoundingInfo.companyWebsite
+  ) {
+    companyFoundingInfo.companyWebsite = updatedData.companyWebsite;
+  }
+  if (
+    updatedData.companyVision &&
+    updatedData.companyVision !== companyFoundingInfo.companyVision
+  ) {
+    companyFoundingInfo.companyVision = updatedData.companyVision;
+  }
+  //save the updated data
+  await companyFoundingInfo.save();
+  const token = generateToken({
+    id: id,
+    role: role,
+    email: email,
+  });
+
+  return {
+    token,
+    data: companyFoundingInfo.toObject(),
+  };
 };
