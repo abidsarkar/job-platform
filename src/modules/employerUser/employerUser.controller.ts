@@ -93,54 +93,39 @@ export const updateCompanyInfo = catchAsync(
       aboutUs
     );
     // Initialize variables for file data
-    let logoData = null;
-    let bannerData = null;
-    let logoFile = null;
-    let bannerFile = null;
-    // Handle logo upload if exists
-    if (req.files && "logo" in req.files && Array.isArray(req.files["logo"])) {
-      console.log("got the logo file");
-      logoFile = req.files["logo"][0];
-      logoFile = req.files["logo"][0];
-      logoData = {
-        fileOriginalName: logoFile.originalname,
-        fileServerName: logoFile.filename,
-        filePathURL: `/uploads/logos/${logoFile.filename}`,
-        pathA: logoFile.path,
-      };
-    }
+    // let logoData = null;
+    // let bannerData = null;
+    // let logoFile = null;
+    // let bannerFile = null;
+// Type assertion for req.files
+const files = req.files as MulterFiles | undefined;
 
-    // Handle logo upload if exists
-    if (
-      req.files &&
-      "banner" in req.files &&
-      Array.isArray(req.files["banner"])
-    ) {
-      bannerFile = req.files["logo"][0];
-      bannerFile = req.files["logo"][0];
-      bannerData = {
-        fileOriginalName: bannerFile.originalname,
-        fileServerName: bannerFile.filename,
-        filePathURL: `/uploads/logos/${bannerFile.filename}`,
-        pathA: bannerFile.path,
-      };
-    }
-    console.log("logo data",logoData);
-    console.log("banner data",bannerData);
-    // if (req.file) {
-    //   // If logo is uploaded, store its path in the variable
-    //   fileOriginalName = req.file.originalname;
-    //   fileServerName = req.file.filename;
-    //   filePathURL = `/uploads/banners/${fileServerName}`;
-    //   pathA = req.file.path;
-    //   await companyBannerUploadService(
-    //     email,
-    //     fileOriginalName,
-    //     fileServerName,
-    //     filePathURL,
-    //     pathA
-    //   );
-    // }
+// Initialize variables for file data
+let logoData: FileData | null = null;
+let bannerData: FileData | null = null;
+
+// Handle logo upload if exists
+if (files?.logo?.[0]) {
+  const logoFile = files.logo[0];
+  logoData = {
+    fileOriginalName: logoFile.originalname,
+    fileServerName: logoFile.filename,
+    filePathURL: `/uploads/logos/${logoFile.filename}`,
+    pathA: logoFile.path
+  };
+}
+
+// Handle banner upload if exists - FIXED THE TYPO FROM YOUR CODE
+if (files?.banner?.[0]) {
+  const bannerFile = files.banner[0]; // Fixed: was using 'logo' instead of 'banner'
+  bannerData = {
+    fileOriginalName: bannerFile.originalname,
+    fileServerName: bannerFile.filename,
+    filePathURL: `/uploads/banners/${bannerFile.filename}`, // Fixed: was using '/logos' instead of '/banners'
+    pathA: bannerFile.path
+  };
+}
+
     sendCookie(res, token);
     // Send the response back to the client
     sendResponse(res, {
