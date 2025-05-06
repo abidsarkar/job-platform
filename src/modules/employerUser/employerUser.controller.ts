@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import { generateToken } from "../../utils/JwtToken";
 import ApiError from "../../errors/ApiError";
+
 import {
   registerSubEmployerUserService,
   deleteSubEmployerUserService,
@@ -14,6 +15,19 @@ import {
 import { sendCookie } from "../generalUser/generalUser.utils";
 import mongoose from "mongoose";
 import path from "path";
+
+import multer from "multer";
+interface FileData {
+  fileOriginalName: string;
+  fileServerName: string;
+  filePathURL: string;
+  pathA: string;
+}
+
+interface MulterFiles {
+  [fieldname: string]: Express.Multer.File[];
+}
+
 // sub employer user registration
 export const registerSubEmployerUser = catchAsync(
   async (req: Request, res: Response) => {
@@ -78,26 +92,41 @@ export const updateCompanyInfo = catchAsync(
       companyName,
       aboutUs
     );
-    // Handle the profile picture
-    let fileOriginalName = null;
-    let fileServerName = null;
-    let filePathURL = null;
-    let pathA = null;
-    
-    if (req.file) {
-      // If logo is uploaded, store its path in the variable
-      fileOriginalName = req.file.originalname;
-      fileServerName = req.file.filename;
-      filePathURL = `/uploads/logos/${fileServerName}`;
-      pathA = req.file.path;
-      await companyLogoUploadService(
-        email,
-        fileOriginalName,
-        fileServerName,
-        filePathURL,
-        pathA
-      );
+    // Initialize variables for file data
+    let logoData = null;
+    let bannerData = null;
+    let logoFile = null;
+    let bannerFile = null;
+    // Handle logo upload if exists
+    if (req.files && "logo" in req.files && Array.isArray(req.files["logo"])) {
+      console.log("got the logo file");
+      logoFile = req.files["logo"][0];
+      logoFile = req.files["logo"][0];
+      logoData = {
+        fileOriginalName: logoFile.originalname,
+        fileServerName: logoFile.filename,
+        filePathURL: `/uploads/logos/${logoFile.filename}`,
+        pathA: logoFile.path,
+      };
     }
+
+    // Handle logo upload if exists
+    if (
+      req.files &&
+      "banner" in req.files &&
+      Array.isArray(req.files["banner"])
+    ) {
+      bannerFile = req.files["logo"][0];
+      bannerFile = req.files["logo"][0];
+      bannerData = {
+        fileOriginalName: bannerFile.originalname,
+        fileServerName: bannerFile.filename,
+        filePathURL: `/uploads/logos/${bannerFile.filename}`,
+        pathA: bannerFile.path,
+      };
+    }
+    console.log("logo data",logoData);
+    console.log("banner data",bannerData);
     // if (req.file) {
     //   // If logo is uploaded, store its path in the variable
     //   fileOriginalName = req.file.originalname;
@@ -125,4 +154,3 @@ export const updateCompanyInfo = catchAsync(
     });
   }
 );
-

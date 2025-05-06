@@ -3,86 +3,46 @@ import path from 'path';
 import fs from 'fs';
 import ApiError from "../errors/ApiError";
 
-// Storage configuration for handling logo and banner
+// Configure Multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let uploadPath = '';
-
-    // Determine the folder destination based on field name
     if (file.fieldname === 'logo') {
-      uploadPath = 'uploads/logos/';
+      // console.log("got the logo file from multer");
+      cb(null, 'uploads/logos/');
     } else if (file.fieldname === 'banner') {
-      uploadPath = 'uploads/banners/';
+      // console.log("got the banner file from multer");
+
+      cb(null, 'uploads/banners/');
     }
-
-    // Ensure the directory exists
-    fs.mkdirSync(uploadPath, { recursive: true });
-
-    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// File filter for logo (only allow specific image types)
-const logoFileFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png|webp|avif/; // Accepted file types for logos
+// File filter for images only
+const fileFilter = (req:any, file:any, cb:any) => {
+  const allowedTypes = /jpeg|jpg|png|webp|avif/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimeType = allowedTypes.test(file.mimetype);
 
   if (mimeType && extname) {
-    return cb(null, true); // Accept the file
+    return cb(null, true); // Allow the file if it matches the filter
   } else {
-    return cb(new ApiError(400, 'Invalid file type for logo. Allowed types: JPG, PNG, WebP, AVIF.'));
+    return cb(new ApiError(400, 'Invalid file type for profile picture. Allowed types: JPG, PNG.'));
   }
 };
 
-// File filter for banner (only allow specific image types)
-const bannerFileFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png|webp|avif/; // Accepted file types for banners
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimeType = allowedTypes.test(file.mimetype);
-
-  if (mimeType && extname) {
-    return cb(null, true); // Accept the file
-  } else {
-    return cb(new ApiError(400, 'Invalid file type for banner. Allowed types: JPG, PNG, WebP, AVIF.'));
+// Initialize Multer with fields configuration
+const uploadLogoAndBanner = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5 // 5MB limit per file
   }
-};
-
-// File size limit (5MB for logos, 10MB for banners)
-const logoUpload = multer({
-  storage: storage,
-  fileFilter: logoFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB size limit for logo
-}).single('logo');
-
-const bannerUpload = multer({
-  storage: storage,
-  fileFilter: bannerFileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB size limit for banner
-}).single('banner');
-
-// Combined upload for both logo and banner at once
-const uploadFields = multer({
-  storage: storage,
-  fileFilter: (req: any, file: any, cb: any) => {
-    if (file.fieldname === 'logo') {
-      return logoFileFilter(req, file, cb);
-    } else if (file.fieldname === 'banner') {
-      return bannerFileFilter(req, file, cb);
-    } else {
-      return cb(new ApiError(400, 'Invalid field name.'));
-    }
-  },
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for any file
 }).fields([
   { name: 'logo', maxCount: 1 },
   { name: 'banner', maxCount: 1 }
 ]);
-
-// Export the upload fields middleware
-export { uploadFields, logoUpload, bannerUpload };
+export { uploadLogoAndBanner };
